@@ -4,6 +4,7 @@ namespace MatrixLift {
 
     void YCoCgMuliplication(int rgbVals[], int result[], int sizeRgb, int sizeResult);
     void YCoCgLifitng(int rgbVals[], int result[], int sizeRgb, int sizeResult);
+
 }
 
 

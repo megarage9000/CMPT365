@@ -29,6 +29,7 @@ namespace MatrixLift {
         int temp = b + (result[2] >> 1);
         result[0] = g - temp; // Cg
         result[1] = temp + (result[0] >> 1); // Y
+
         result[0] = result[0] >> 1; // Scaling down Cg
         result[2] = result[2] >> 1; // Scaling down Co
     }

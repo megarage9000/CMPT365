@@ -23,15 +23,39 @@ void MainWindow::on_pushButton_clicked()
 {
     clearOutput();
     int minRgb = getMinRgbValues();
+    bool invalidValues = false;
     if(minRgb < 0 || minRgb >= 255) {
         appendOutput("ERROR: Invalid minimum RGB values\n");
+        invalidValues = true;
     }
 
     int maxRgb = getMaxRgbValues();
     if(maxRgb < 0 || maxRgb > 255 || minRgb >= maxRgb) {
         appendOutput("ERROR: Invalid maximum RGB values\n");
+        invalidValues = true;
+    }
+
+    if(invalidValues){
+        return;
+    }
+    else{
+        MatrixLift::matrixOperation multiplication = MatrixLift::YCoCgMuliplication;
+        MatrixLift::matrixOperation lifting = MatrixLift::YCoCgLifitng;
+
+        MatrixThread *multiplicationThread = new MatrixThread(this, minRgb, maxRgb, multiplication);
+        connect(multiplicationThread, &MatrixThread::resultReady, this, &MainWindow::appendMultplicationOutput);
+        connect(multiplicationThread, &MatrixThread::finished, multiplicationThread, &QObject::deleteLater);
+
+        MatrixThread *liftingThread = new MatrixThread(this, minRgb, maxRgb, lifting);
+        connect(liftingThread, &MatrixThread::resultReady, this, &MainWindow::appendLiftingOutput);
+        connect(liftingThread, &MatrixThread::finished, liftingThread, &QObject::deleteLater);
+
+        liftingThread->start();
+        multiplicationThread->start();
     }
 }
+
+
 
 int MainWindow::getMinRgbValues(){
     return ui->MinRgbInput->text().toInt();

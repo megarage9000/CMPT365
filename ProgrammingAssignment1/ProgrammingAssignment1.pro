@@ -11,11 +11,13 @@ CONFIG += c++11
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
-    matrixlift.cpp
+    matrixlift.cpp \
+    matrixthread.cpp
 
 HEADERS += \
     mainwindow.h \
-    matrixlift.h
+    matrixlift.h \
+    matrixthread.h
 
 FORMS += \
     mainwindow.ui

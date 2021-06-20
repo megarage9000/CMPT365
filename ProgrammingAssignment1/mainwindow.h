@@ -2,13 +2,14 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QThread>
 #include <iostream>
 #include <string>
+#include "matrixthread.h"
 #include "matrixlift.h"
 
+
 QT_BEGIN_NAMESPACE
-namespace Ui { class MainWindow; class MatrixThread; }
+namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
 class MainWindow : public QMainWindow
@@ -36,32 +37,8 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-    void runMultiplication();
-    void runLifting();
 };
 
-class MatrixThread : public QThread{
-    Q_OBJECT
-public:
-    typedef QString (*matrixOperation)(int, int);
-    MatrixThread(QObject *parent, int min, int max, matrixOperation operation) : QThread(parent) {
 
-    }
-
-public slots:
-    void doWork(const QString &parameter) {
-        QString result = operation(minValue, maxValue);
-        emit resultReady(result);
-    }
-
-signals:
-    void resultReady(const QString &result);
-
-private:
-    int minValue;
-    int maxValue;
-
-    matrixOperation operation;
-};
 
 #endif // MAINWINDOW_H

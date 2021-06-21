@@ -3,6 +3,7 @@
 
 #include <QThread>
 #include <chrono>
+#include <cmath>
 #include "matrixlift.h"
 
 class MatrixThread : public QThread{

@@ -15,7 +15,7 @@ using namespace std::chrono;
 void MatrixThread::run() {
 
     double gbr[3] = {0, 0, 0};
-    steady_clock::time_point start = std::chrono::steady_clock::now();
+    high_resolution_clock::time_point start = std::chrono::high_resolution_clock::now();
     QString resultOutput;
     for(int g = minValue; g <= maxValue; g++){
         gbr[0] = g;
@@ -34,9 +34,10 @@ void MatrixThread::run() {
             }
         }
     }
-    steady_clock::time_point end = std::chrono::steady_clock::now();
+    double numOperations = pow((maxValue - minValue), 3);
+    high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
     milliseconds elapsedTime = duration_cast<milliseconds>(end - start);
-    emit resultReady(QString(resultOutput + "\n ---------- \n Total elapsed time in milliseconds = %1 \n ---------- \n").arg(elapsedTime.count()));
+    emit resultReady(QString(resultOutput + "\n ---------- \n Elapsed time per operation in milliseconds = %1 \n ---------- \n").arg(elapsedTime.count() / numOperations));
 }
 
 

@@ -2,9 +2,9 @@
 #define MATRIXLIFT_H
 namespace MatrixLift {
 
-    void YCoCgMuliplication(int rgbVals[], int result[], int sizeRgb, int sizeResult);
-    void YCoCgLifitng(int rgbVals[], int result[], int sizeRgb, int sizeResult);
-    typedef void(*matrixOperation)(int[], int[], int, int) ;
+    void YCoCgMultiplication(double rgbVals[], double result[], int sizeRgb, int sizeResult);
+    void YCoCgLifting(double rgbVals[], double result[], int sizeRgb, int sizeResult);
+    typedef void(*matrixOperation)(double[], double[], int, int) ;
 }
 
 

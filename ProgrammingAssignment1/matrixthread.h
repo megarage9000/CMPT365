@@ -2,6 +2,7 @@
 #define MATRIXTHREAD_H
 
 #include <QThread>
+#include <chrono>
 #include "matrixlift.h"
 
 class MatrixThread : public QThread{

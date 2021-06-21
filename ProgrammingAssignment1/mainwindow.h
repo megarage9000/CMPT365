@@ -26,7 +26,7 @@ private slots:
     void on_pushButton_clicked();
     int getMinRgbValues();
     int getMaxRgbValues();
-    void setMultplicationOutput(QString output);
+    void setMultiplicationOutput(QString output);
     void setLiftingOutput(QString output);
     void appendMultplicationOutput(QString output);
     void appendLiftingOutput(QString output);
@@ -34,6 +34,8 @@ private slots:
     void setOutput(QString output);
     void clearOutput();
 
+
+    void on_pushButtonCustom_clicked();
 
 private:
     Ui::MainWindow *ui;

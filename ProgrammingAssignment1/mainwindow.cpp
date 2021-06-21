@@ -39,8 +39,8 @@ void MainWindow::on_pushButton_clicked()
         return;
     }
     else{
-        MatrixLift::matrixOperation multiplication = MatrixLift::YCoCgMuliplication;
-        MatrixLift::matrixOperation lifting = MatrixLift::YCoCgLifitng;
+        MatrixLift::matrixOperation multiplication = MatrixLift::YCoCgMultiplication;
+        MatrixLift::matrixOperation lifting = MatrixLift::YCoCgLifting;
 
         MatrixThread *multiplicationThread = new MatrixThread(this, minRgb, maxRgb, multiplication);
         connect(multiplicationThread, &MatrixThread::resultReady, this, &MainWindow::appendMultplicationOutput);
@@ -65,7 +65,7 @@ int MainWindow::getMaxRgbValues(){
     return ui->MaxRgbInput->text().toInt();
 }
 
-void MainWindow::setMultplicationOutput(QString output){
+void MainWindow::setMultiplicationOutput(QString output){
     ui->matrixMultiplicationOutput->setPlainText(output);
 }
 void MainWindow::setLiftingOutput(QString output){
@@ -85,12 +85,33 @@ void MainWindow::appendOutput(QString output) {
 }
 void MainWindow::setOutput(QString output){
     setLiftingOutput(output);
-    setMultplicationOutput(output);
+    setMultiplicationOutput(output);
 }
 
 void MainWindow::clearOutput(){
     setOutput("");
 }
 
+void MainWindow::on_pushButtonCustom_clicked()
+{
+    clearOutput();
+    int temp;
+    double redValue = ((temp = ui->RedInput->text().toInt()) <= 255) ? temp : 0;
+    double blueValue = ((temp = ui->BlueInput->text().toInt()) <= 255) ? temp : 0;
+    double greenValue = ((temp = ui->GreenInput->text().toInt()) <= 255) ? temp : 0;
 
+    double liftResult[3], multiplyResult[3];
+    double input[3] = {greenValue, blueValue, redValue};
+    MatrixLift::YCoCgLifting(input, liftResult, 3, 3);
+    MatrixLift::YCoCgMultiplication(input, multiplyResult, 3, 3);
+
+    setLiftingOutput(
+                QString("- Cg = %1 \n- Y = %2 \n- Co = %3\n")
+                .arg(liftResult[0]).arg(liftResult[1]).arg(liftResult[2])
+                );
+    setMultiplicationOutput(
+                QString("- Cg = %1 \n- Y = %2 \n- Co = %3\n")
+                .arg(multiplyResult[0]).arg(multiplyResult[1]).arg(multiplyResult[2])
+                );
+}
 

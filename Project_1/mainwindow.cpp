@@ -10,6 +10,8 @@ MainWindow::MainWindow(QWidget *parent)
         tr("Open Image"), "/home/megarage9000/repos/CMPT365", tr("Image Files (*.png *.jpg *.bmp)"));
     std::cout << "File name = " << fileName.toStdString() << std::endl;
     BMPFile test = BMPFile(fileName);
+    test.getGrayScale();
+    test.getGrayScaleDither();
     test.getAutoLevel();
 }
 

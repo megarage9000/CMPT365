@@ -30,11 +30,7 @@ QImage BMPFile::getGrayScale() {
             int blue = qBlue(rgbVal[x]) * 0.114;
             int grayScaleValue = red + green + blue;
 
-            rgbVal[x] = qRgb(
-                        grayScaleValue,
-                        grayScaleValue,
-                        grayScaleValue
-                        );
+            rgbVal[x] = qRgb(grayScaleValue, grayScaleValue, grayScaleValue);
         }
     }
 
@@ -66,10 +62,10 @@ QImage BMPFile::getGrayScaleDither() {
             int normalizedValue = qRed(rgbVal[x]) / 17;
             int ditherValue = getDitherValue(ditherRow, ditherCol);
             if(normalizedValue > ditherValue){
-                rgbVal[x] = qRgb(0, 0, 0);
+                rgbVal[x] = qRgb(255, 255, 255);
             }
             else{
-                rgbVal[x] = qRgb(255, 255, 255);
+                rgbVal[x] = qRgb(0, 0, 0);
             }
         }
     }
@@ -165,7 +161,7 @@ QImage BMPFile::getAutoLevel() {
             newGreen = imageRgbs[1][prevGreen].newRgbVal;
             newBlue = imageRgbs[2][prevBlue].newRgbVal;
 
-            newRgbVal[x] = QColor(newRed, newGreen, newBlue).rgba();
+            newRgbVal[x] = qRgb(newRed, newGreen, newBlue);
         }
     }
     // Saving (Not needed for the project)

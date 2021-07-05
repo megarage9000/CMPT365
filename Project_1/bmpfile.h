@@ -6,6 +6,7 @@
 #include <QString>
 #include <QImage>
 #include <iostream>
+#include <QFile>
 
 class BMPFile
 {

@@ -2,6 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "qcustomplot.h"
+#include "wavfile.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -15,8 +17,11 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    void plotWavFile();
 
 private:
     Ui::MainWindow *ui;
+    QCustomPlot * plot;
+    wavfile * file;
 };
 #endif // MAINWINDOW_H

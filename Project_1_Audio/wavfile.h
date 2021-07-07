@@ -16,15 +16,23 @@ public:
     void readWavFile(QString fileName);
     int * getData();
     void modifyData(float startingPercent, float endPercent, int startIndex, int endIndex);
+    QVector<double> getSamples();
+    QVector<double> getAmplitudes();
+    int getDataSizeInSamples();
+    int getLowestAmplitude();
+    int getHighestAmplitude();
 
 private:
-    int data[MAX_SAMPLES] = {};
     int numChannels;
     int sampleRate;
     int byteRate;
     int bitsPerSample;
     int dataSize;
     int dataSizeInSamples;
+    int lowestAmplitude;
+    int highestAmplitude;
+    QVector<double> samples;
+    QVector<double> amplitudes;
 };
 
 #endif // WAVFILE_H

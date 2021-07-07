@@ -2,6 +2,8 @@
 
 wavfile::wavfile(QString fileName)
 {
+    samples = QVector<double>(MAX_SAMPLES);
+    amplitudes = QVector<double>(MAX_SAMPLES);
     readWavFile(fileName);
 }
 
@@ -53,25 +55,36 @@ void wavfile::readWavFile(QString fileName) {
 
     int numBytesToRead = bitsPerSample / 8;
     dataSizeInSamples = dataSize / numBytesToRead;
+
+    lowestAmplitude = 0;
+    highestAmplitude = 0;
     if(numBytesToRead == 2) {
         for(int i = 0; i < dataSizeInSamples ; i++) {
-            data[i] = fromLittleEndian<qint16_le>(&wavFile, numBytesToRead);
+            amplitudes[i] = fromLittleEndian<qint16_le>(&wavFile, numBytesToRead);
+            samples[i] = i;
+            if(amplitudes[i] > highestAmplitude) {
+                highestAmplitude = amplitudes[i];
+            }
+            if(amplitudes[i] < lowestAmplitude) {
+                lowestAmplitude = amplitudes[i];
+            }
         }
     }
     else{
         for(int i = 0; i < dataSizeInSamples ; i++) {
-            data[i] = fromLittleEndian<qint32_le>(&wavFile, numBytesToRead);
+            amplitudes[i] = fromLittleEndian<qint32_le>(&wavFile, numBytesToRead);
+            samples[i] = i;
+            if(amplitudes[i] > highestAmplitude) {
+                highestAmplitude = amplitudes[i];
+            }
+            if(amplitudes[i] < lowestAmplitude) {
+                lowestAmplitude = amplitudes[i];
+            }
         }
-    }
-    for(int j = 0; j < dataSizeInSamples; j++) {
-        cout << "index " << j << " = " << data[j] << endl;
     }
     wavFile.close();
 }
 
-int * wavfile::getData() {
-    return data;
-}
 
 void wavfile::modifyData(float startingPercent, float endPercent, int startIndex, int endIndex){
     // We will increase the starting percent to end percent linearly
@@ -83,5 +96,24 @@ void wavfile::modifyData(float startingPercent, float endPercent, int startIndex
 
 }
 
+QVector<double> wavfile::getSamples() {
+    return samples;
+}
+
+QVector<double> wavfile::getAmplitudes() {
+    return amplitudes;
+}
+
+int wavfile::getDataSizeInSamples(){
+    return dataSizeInSamples;
+}
+
+int wavfile::getHighestAmplitude(){
+    return highestAmplitude;
+}
+
+int wavfile::getLowestAmplitude(){
+    return lowestAmplitude;
+}
 
 

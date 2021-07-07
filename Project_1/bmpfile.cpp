@@ -60,13 +60,13 @@ QImage BMPFile::getGrayScaleDither() {
         for(int x = 0; x < width; x++) {
             int ditherRow = y % 4;
             int ditherCol = x % 4;
-            int normalizedValue = qRed(rgbVal[x]) / 17;
+            int normalizedValue = qRed(rgbVal[x]) / (256/17); // Take any random rgb value from the grayscale
             int ditherValue = getDitherValue(ditherRow, ditherCol);
             if(normalizedValue > ditherValue){
-                rgbVal[x] = qRgb(255, 255, 255);
+                rgbVal[x] = qRgb(255, 255, 255); // white
             }
             else{
-                rgbVal[x] = qRgb(0, 0, 0);
+                rgbVal[x] = qRgb(0, 0, 0); // black
             }
         }
     }

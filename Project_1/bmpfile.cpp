@@ -23,8 +23,9 @@ QImage BMPFile::getGrayScale() {
         for(int x = 0; x < width; x++) {
 
             // Using the YUV color space weights to get grayscale value
-            // Source: https://www.kdnuggets.com/2019/12/convert-rgb-image-grayscale.html
-            // (Linear Approximation)
+            // Source: https://www.kdnuggets.com/2019/12/convert-rgb-image-grayscale.html (Linear Approximation),
+            // and Lecture notes
+
             int red = qRed(rgbVal[x]) * 0.299;
             int green = qGreen(rgbVal[x]) * 0.587;
             int blue = qBlue(rgbVal[x]) * 0.114;

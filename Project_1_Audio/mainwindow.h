@@ -11,6 +11,7 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
+    // Try waveplot form: https://stackoverflow.com/questions/50277132/qt-audio-file-to-wave-like-audacity
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();

@@ -7,12 +7,14 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    QString fileName = QFileDialog::getOpenFileName(
-                this,
-                tr("Open WAV file"),
-                "/home/megarage9000/repos/CMPT365",
-                tr("Wav files (*.wav)"));
-    wavfile file(fileName);
+//    QString fileName = QFileDialog::getOpenFileName(
+//                this,
+//                tr("Open WAV file"),
+//                "/home/megarage9000/repos/CMPT365",
+//                tr("Wav files (*.wav)"));
+//    wavfile file(fileName);
+//    int * data = file.getData();
+
 }
 
 MainWindow::~MainWindow()

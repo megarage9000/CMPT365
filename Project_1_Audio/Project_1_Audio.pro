@@ -1,6 +1,8 @@
-QT       += core gui multimedia
+QT       += core gui
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
+TARGET = Project_1_Audio
+TEMPLATE = app
 
 CONFIG += c++11
 
@@ -11,10 +13,12 @@ CONFIG += c++11
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
+    qcustomplot.cpp \
     wavfile.cpp
 
 HEADERS += \
     mainwindow.h \
+    qcustomplot.h \
     wavfile.h
 
 FORMS += \

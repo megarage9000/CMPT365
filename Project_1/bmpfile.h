@@ -11,14 +11,28 @@
 class BMPFile
 {
 public:
+    BMPFile();
     BMPFile(QString fileLocation);
+    void calculateImages(QString fileLocation);
+    QImage getOriginal();
     QImage getAutoLevel();
     QImage getGrayScale();
     QImage getGrayScaleDither();
 
+    void getRgbIntensities(QImage * image,
+                           QVector<double> * red,
+                           QVector<double> * green,
+                           QVector<double> * blue);
+
 private:
+    void calculateAutoLevel();
+    void calculateGrayScale();
+    void calculateDither();
+
     QImage imageFile;
     QImage imageFileGrayScale;
+    QImage imageFileDither;
+    QImage imageAutoLevel;
     int ditherMatrix[4][4] = {
         {7, 9, 0, 4},
         {8, 10, 1, 2},

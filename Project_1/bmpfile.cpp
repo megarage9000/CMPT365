@@ -1,7 +1,10 @@
 #include "bmpfile.h"
 
-BMPFile::BMPFile(QString fileLocation)
-{
+BMPFile::BMPFile() {
+
+}
+
+void BMPFile::calculateImages(QString fileLocation) {
     imageFile = QImage(fileLocation).convertToFormat(QImage::Format_RGB32);
     if(imageFile.isNull()) {
         printf("Unable to to get image\n");
@@ -9,11 +12,17 @@ BMPFile::BMPFile(QString fileLocation)
     else {
         printf("Got an image!\n");
     }
-    getGrayScale();
+    calculateGrayScale();
+    calculateDither();
+    calculateAutoLevel();
+}
+BMPFile::BMPFile(QString fileLocation)
+{
+    calculateImages(fileLocation);
 }
 
 // --- Grayscale ---
-QImage BMPFile::getGrayScale() {
+void BMPFile::calculateGrayScale() {
     int width = imageFile.width();
     int height = imageFile.height();
 
@@ -40,23 +49,25 @@ QImage BMPFile::getGrayScale() {
     if(file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
         if(imageFileGrayScale.save(&file) == true) {
             std::cout << "finished image manipulation" << std::endl;
-            return imageFileGrayScale;
         }
         else {
             std::cout << "unable to save new image" << std::endl;
         }
     }
+}
+
+QImage BMPFile::getGrayScale() {
     return imageFileGrayScale;
 }
 
 // --- GrayscaleDither ---
-QImage BMPFile::getGrayScaleDither() {
+void BMPFile::calculateDither() {
     int width = imageFileGrayScale.width();
     int height = imageFileGrayScale.height();
 
-    QImage ditheredImage = imageFileGrayScale.copy();
+    imageFileDither = imageFileGrayScale.copy();
     for(int y = 0; y < height; y++) {
-        QRgb * rgbVal = (QRgb *)ditheredImage.scanLine(y);
+        QRgb * rgbVal = (QRgb *)imageFileDither.scanLine(y);
         for(int x = 0; x < width; x++) {
             int ditherRow = y % 4;
             int ditherCol = x % 4;
@@ -74,17 +85,17 @@ QImage BMPFile::getGrayScaleDither() {
     QString fileName("/home/megarage9000/repos/CMPT365/Project_1/bmpTestFiles/grayScaleDither.bmp");
     QFile file(fileName);
     if(file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-        if(ditheredImage.save(&file) == true) {
+        if(imageFileDither.save(&file) == true) {
             std::cout << "finished image manipulation" << std::endl;
-            return ditheredImage;
         }
         else {
             std::cout << "unable to save new image" << std::endl;
         }
     }
-    return ditheredImage;
+}
 
-
+QImage BMPFile::getGrayScaleDither() {
+    return imageFileDither;
 }
 
 // --- Autolevel ---
@@ -94,9 +105,7 @@ struct rgbPdfCdf {
     int newRgbVal;
 };
 
-
-
-QImage BMPFile::getAutoLevel() {
+void BMPFile::calculateAutoLevel() {
     // Auto color level is done via histogram equalization
     // Source: https://www.tutorialspoint.com/dip/histogram_equalization.htm
 
@@ -148,10 +157,10 @@ QImage BMPFile::getAutoLevel() {
     }
 
     // Create new image with auto-corrected colors
-    QImage newImage = imageFile.copy();
+    imageAutoLevel = imageFile.copy();
     int newRed, newGreen, newBlue, prevRed, prevGreen, prevBlue;
     for(int y = 0; y < height; ++y) {
-        QRgb * newRgbVal = (QRgb *)newImage.scanLine(y);
+        QRgb * newRgbVal = (QRgb *)imageAutoLevel.scanLine(y);
         for(int x = 0; x < width; ++x) {
 
             prevRed = qRed(newRgbVal[x]);
@@ -169,16 +178,40 @@ QImage BMPFile::getAutoLevel() {
     QString fileName("/home/megarage9000/repos/CMPT365/Project_1/bmpTestFiles/autoCorrect.bmp");
     QFile file(fileName);
     if(file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-        if(newImage.save(&file) == true) {
+        if(imageAutoLevel.save(&file) == true) {
             std::cout << "finished image manipulation" << std::endl;
-            return newImage;
         }
         else {
             std::cout << "unable to save new image" << std::endl;
         }
     }
-    return newImage;
 }
 
+QImage BMPFile::getAutoLevel() {
+    return imageAutoLevel;
+}
+
+
+void BMPFile::getRgbIntensities(QImage * image,
+                       QVector<double> * red,
+                       QVector<double> * green,
+                       QVector<double> * blue) {
+
+    int imageWidth = image->width();
+    int imageHeight = image->height();
+    for(int y = 0; y < imageHeight; y++) {
+        QRgb * rgbVals = (QRgb*)image->constScanLine(y);
+        for(int x = 0; x < imageWidth; x++) {
+            (*red)[qRed(rgbVals[x])]++;
+            (*green)[qGreen(rgbVals[x])]++;
+            (*blue)[qBlue(rgbVals[x])]++;
+        }
+    }
+}
+
+
+QImage BMPFile::getOriginal(){
+    return imageFile;
+}
 
 

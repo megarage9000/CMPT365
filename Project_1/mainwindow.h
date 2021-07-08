@@ -5,6 +5,8 @@
 #include <QFileDialog>
 #include <bmpfile.h>
 #include <iostream>
+#include <QLabel>
+#include <QtGui>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -17,8 +19,22 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    void setNewImagePair();
+
+private slots:
+    void on_pushButton_2_clicked();
+
+    void on_pushButton_clicked();
 
 private:
+    void loadImagesToLabels(QImage image1, QImage image2);
     Ui::MainWindow *ui;
+    BMPFile file;
+    QLabel * image1;
+    QLabel * image2;
+    QImage imagePairs[3][2];
+    QImage currentImagePair[2];
+    int index = 1;
+    bool hasImage = false;
 };
 #endif // MAINWINDOW_H

@@ -6,17 +6,62 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    QString fileName = QFileDialog::getOpenFileName(this,
-        tr("Open Image"), "/home/megarage9000/repos/CMPT365", tr("Image Files (*.png *.jpg *.bmp)"));
-    std::cout << "File name = " << fileName.toStdString() << std::endl;
-    BMPFile test = BMPFile(fileName);
-    test.getGrayScale();
-    test.getGrayScaleDither();
-    test.getAutoLevel();
+    file = BMPFile();
+    image1 = ui->label;
+    image2 = ui->label_2;
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::loadImagesToLabels(QImage newImage1, QImage newImage2) {
+    image1->setPixmap(QPixmap::fromImage(newImage1));
+    image2->setPixmap(QPixmap::fromImage(newImage2));
+    image1->adjustSize();
+    image2->adjustSize();
+}
+
+void MainWindow::setNewImagePair() {
+    if(hasImage) {
+        currentImagePair[0] = imagePairs[index][0];
+        currentImagePair[1] = imagePairs[index][1];
+        loadImagesToLabels(currentImagePair[0], currentImagePair[1]);
+        index++;
+        if(index > 2) {
+            index = 0;
+        }
+        std::cout << "Image pair = " << index << std::endl;
+    }
+}
+
+void MainWindow::on_pushButton_2_clicked()
+{
+    QString fileName = QFileDialog::getOpenFileName(this,
+        tr("Open Image"), "/home/megarage9000/repos/CMPT365", tr("Image Files (*.png *.jpg *.bmp)"));
+    std::cout << "File name = " << fileName.toStdString() << std::endl;
+    file.calculateImages(fileName);
+    QImage original = file.getOriginal();
+    QImage grayScale = file.getGrayScale();
+    QImage dither = file.getGrayScaleDither();
+    QImage autoLevel = file.getAutoLevel();
+
+    imagePairs[0][0] = original.copy();
+    imagePairs[0][1] = grayScale.copy();
+
+    imagePairs[1][0] = grayScale.copy();
+    imagePairs[1][1] = dither.copy();
+
+    imagePairs[2][0] = original.copy();
+    imagePairs[2][1] = autoLevel.copy();
+    hasImage = true;
+    setNewImagePair();
+}
+
+
+void MainWindow::on_pushButton_clicked()
+{
+    setNewImagePair();
 }
 

@@ -19,9 +19,13 @@ public:
     ~MainWindow();
     void plotWavFile();
 
+private slots:
+    void on_pushButton_clicked();
+
 private:
     Ui::MainWindow *ui;
     QCustomPlot * plot;
+    QCustomPlot * plot2;
     wavfile * file;
 };
 #endif // MAINWINDOW_H

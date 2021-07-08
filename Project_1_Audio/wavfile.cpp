@@ -2,8 +2,6 @@
 
 wavfile::wavfile(QString fileName)
 {
-    samples = QVector<double>(MAX_SAMPLES);
-    amplitudes = QVector<double>(MAX_SAMPLES);
     readWavFile(fileName);
 }
 
@@ -55,7 +53,8 @@ void wavfile::readWavFile(QString fileName) {
 
     int numBytesToRead = bitsPerSample / 8;
     dataSizeInSamples = dataSize / numBytesToRead;
-
+    samples = QVector<double>(dataSizeInSamples);
+    amplitudes = QVector<double>(dataSizeInSamples);
     lowestAmplitude = 0;
     highestAmplitude = 0;
     if(numBytesToRead == 2) {
@@ -86,15 +85,33 @@ void wavfile::readWavFile(QString fileName) {
 }
 
 
-void wavfile::modifyData(float startingPercent, float endPercent, int startIndex, int endIndex){
+void wavfile::modifyData(float startingPercent, float endPercent, int startIndex, int endIndex, QVector<double> * dest){
     // We will increase the starting percent to end percent linearly
     int numSamples = endIndex - startIndex;
-    int rate = (endPercent - startingPercent) / numSamples;
-    for(int i = 0; i < numSamples; i++) {
-
+    double rate = (double)(endPercent - startingPercent) / numSamples;
+    double currentRate = startingPercent + rate;
+    for(int i = startIndex; i < endIndex; i++) {
+        double log = pow(10.0, (currentRate / 20.0));
+        (*dest)[i] = (amplitudes[i] * log);
+        currentRate += rate;
     }
-
 }
+
+void wavfile::normalizeDataAmplitudes(int start, int end){
+    int newRange = end - start;
+    int prevRange = highestAmplitude - lowestAmplitude;
+    for(int i = 0; i < dataSizeInSamples; i++) {
+        amplitudes[i] = (double)(amplitudes[i] / prevRange) * newRange;
+    }
+}
+
+void wavfile::normalizeDataSamples(int start, int end){
+    int newRange = end - start;
+    for(int i = 0; i < dataSizeInSamples; i++) {
+        samples[i] = (double)(samples[i] / dataSizeInSamples) * newRange;
+    }
+}
+
 
 QVector<double> wavfile::getSamples() {
     return samples;

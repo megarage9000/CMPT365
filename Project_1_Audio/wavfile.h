@@ -6,6 +6,7 @@
 #include <QtEndian>
 #include <QMessageBox>
 #include <iostream>
+#include <tgmath.h>
 
 #define MAX_SAMPLES 8 * 65536
 
@@ -15,7 +16,9 @@ public:
     wavfile(QString fileName);
     void readWavFile(QString fileName);
     int * getData();
-    void modifyData(float startingPercent, float endPercent, int startIndex, int endIndex);
+    void modifyData(float startingPercent, float endPercent, int startIndex, int endIndex, QVector<double> * dest);
+    void normalizeDataSamples(int start, int end);
+    void normalizeDataAmplitudes(int start, int end);
     QVector<double> getSamples();
     QVector<double> getAmplitudes();
     int getDataSizeInSamples();

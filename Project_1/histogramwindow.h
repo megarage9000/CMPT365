@@ -28,10 +28,12 @@ private:
     QVector<QVector<double>> modifiedRGB;
     QVector<double> numPixels;
 
+    // RGB values from original
     QCustomPlot * redVals;
     QCustomPlot * greenVals;
     QCustomPlot * blueVals;
 
+    // RGB values from modified
     QCustomPlot * MredVals;
     QCustomPlot * MgreenVals;
     QCustomPlot * MblueVals;

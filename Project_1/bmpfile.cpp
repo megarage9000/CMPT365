@@ -39,17 +39,6 @@ void BMPFile::calculateGrayScale() {
             rgbVal[x] = qRgb(grayScaleValue, grayScaleValue, grayScaleValue);
         }
     }
-
-    QString fileName("/home/megarage9000/repos/CMPT365/Project_1/bmpTestFiles/grayScale.bmp");
-    QFile file(fileName);
-    if(file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-        if(imageFileGrayScale.save(&file) == true) {
-            std::cout << "finished image manipulation" << std::endl;
-        }
-        else {
-            std::cout << "unable to save new image" << std::endl;
-        }
-    }
 }
 
 QImage BMPFile::getGrayScale() {
@@ -75,17 +64,6 @@ void BMPFile::calculateDither() {
             else{
                 rgbVal[x] = qRgb(0, 0, 0); // black
             }
-        }
-    }
-
-    QString fileName("/home/megarage9000/repos/CMPT365/Project_1/bmpTestFiles/grayScaleDither.bmp");
-    QFile file(fileName);
-    if(file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-        if(imageFileDither.save(&file) == true) {
-            std::cout << "finished image manipulation" << std::endl;
-        }
-        else {
-            std::cout << "unable to save new image" << std::endl;
         }
     }
 }
@@ -168,17 +146,6 @@ void BMPFile::calculateAutoLevel() {
             newBlue = imageRgbs[2][prevBlue].newRgbVal;
 
             newRgbVal[x] = qRgb(newRed, newGreen, newBlue);
-        }
-    }
-    // Saving (Not needed for the project)
-    QString fileName("/home/megarage9000/repos/CMPT365/Project_1/bmpTestFiles/autoCorrect.bmp");
-    QFile file(fileName);
-    if(file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-        if(imageAutoLevel.save(&file) == true) {
-            std::cout << "finished image manipulation" << std::endl;
-        }
-        else {
-            std::cout << "unable to save new image" << std::endl;
         }
     }
 }

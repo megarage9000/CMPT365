@@ -7,8 +7,8 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     file = BMPFile();
-    image1 = ui->label;
-    image2 = ui->label_2;
+    imageDisplay1 = ui->label;
+    imageDisplay2 = ui->label_2;
 }
 
 MainWindow::~MainWindow()
@@ -16,11 +16,11 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::loadImagesToLabels(QImage newImage1, QImage newImage2) {
-    image1->setPixmap(QPixmap::fromImage(newImage1));
-    image2->setPixmap(QPixmap::fromImage(newImage2));
-    image1->adjustSize();
-    image2->adjustSize();
+void MainWindow::loadImagesToLabels(QImage Image1, QImage Image2) {
+    imageDisplay1->setPixmap(QPixmap::fromImage(Image1));
+    imageDisplay2->setPixmap(QPixmap::fromImage(Image2));
+    imageDisplay1->adjustSize();
+    imageDisplay2->adjustSize();
 }
 
 void MainWindow::setNewImagePair() {
@@ -35,6 +35,7 @@ void MainWindow::setNewImagePair() {
     }
 }
 
+// For "New Image" Button
 void MainWindow::on_pushButton_2_clicked()
 {
     QString fileName = QFileDialog::getOpenFileName(this,
@@ -57,15 +58,13 @@ void MainWindow::on_pushButton_2_clicked()
     setNewImagePair();
 }
 
-
+// For "Next" Button
 void MainWindow::on_pushButton_clicked()
 {
     setNewImagePair();
 }
 
-
-
-
+// For "Get Histogram" Button
 void MainWindow::on_pushButton_3_clicked()
 {
     if(hasImage){
@@ -74,7 +73,7 @@ void MainWindow::on_pushButton_3_clicked()
     }
 }
 
-
+// For "Quit" Button
 void MainWindow::on_pushButton_4_clicked()
 {
     close();

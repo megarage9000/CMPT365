@@ -12,11 +12,14 @@ HistogramWindow::HistogramWindow(QImage image1, QImage image2) :
     ui(new Ui::HistogramWindow)
     {
     ui->setupUi(this);
+    // Setting up the x parameter for our histograms
     numPixels = QVector<double>(256);
     int size = numPixels.size();
     for(int i = 0; i < size; i++) {
         numPixels[i] = i;
     }
+
+    // Getting QCustomPlot pointers
     redVals = ui->Red;
     greenVals = ui->Green;
     blueVals = ui->Blue;
@@ -25,6 +28,7 @@ HistogramWindow::HistogramWindow(QImage image1, QImage image2) :
     MgreenVals = ui->MGreen;
     MblueVals = ui->MBlue;
 
+    // Filling up our RGB values from our images
     originalRGB = QVector<QVector<double>>(3);
     modifiedRGB = QVector<QVector<double>>(3);
 
@@ -46,6 +50,7 @@ HistogramWindow::HistogramWindow(QImage image1, QImage image2) :
                       &modifiedRGB[1],
                       &modifiedRGB[2]);
 
+    // Plotting
     plot(redVals, originalRGB[0], "Red", Qt::red);
     plot(greenVals, originalRGB[1], "Green", Qt::green);
     plot(blueVals, originalRGB[2], "Blue", Qt::blue);
@@ -80,7 +85,6 @@ void HistogramWindow::getRgbIntensities(QImage * image,
 void HistogramWindow::plot(QCustomPlot * graph, QVector<double> values, QString name, QColor color) {
     double max;
     getMax(values, &max);
-
     graph->plotLayout()->insertRow(0);
     graph->plotLayout()->addElement(0, 0, new QCPTextElement(graph, name, QFont("sans", 12, QFont::Bold)));
     graph->xAxis->setRange(0, 255);

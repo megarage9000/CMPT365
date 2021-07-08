@@ -19,11 +19,6 @@ public:
     QImage getGrayScale();
     QImage getGrayScaleDither();
 
-    void getRgbIntensities(QImage * image,
-                           QVector<double> * red,
-                           QVector<double> * green,
-                           QVector<double> * blue);
-
 private:
     void calculateAutoLevel();
     void calculateGrayScale();

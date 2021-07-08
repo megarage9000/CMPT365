@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QFileDialog>
 #include <bmpfile.h>
+#include <histogramwindow.h>
 #include <iostream>
 #include <QLabel>
 #include <QtGui>
@@ -26,6 +27,10 @@ private slots:
 
     void on_pushButton_clicked();
 
+    void on_pushButton_3_clicked();
+
+    void on_pushButton_4_clicked();
+
 private:
     void loadImagesToLabels(QImage image1, QImage image2);
     Ui::MainWindow *ui;
@@ -34,7 +39,7 @@ private:
     QLabel * image2;
     QImage imagePairs[3][2];
     QImage currentImagePair[2];
-    int index = 1;
+    int index = 0;
     bool hasImage = false;
 };
 #endif // MAINWINDOW_H

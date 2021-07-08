@@ -1,5 +1,5 @@
 QT       += core gui
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 
 CONFIG += c++11
 
@@ -9,14 +9,19 @@ CONFIG += c++11
 
 SOURCES += \
     bmpfile.cpp \
+    histogramwindow.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    qcustomplot.cpp
 
 HEADERS += \
     bmpfile.h \
-    mainwindow.h
+    histogramwindow.h \
+    mainwindow.h \
+    qcustomplot.h
 
 FORMS += \
+    histogramwindow.ui \
     mainwindow.ui
 
 # Default rules for deployment.

@@ -32,15 +32,13 @@ void MainWindow::setNewImagePair() {
         if(index > 2) {
             index = 0;
         }
-        std::cout << "Image pair = " << index << std::endl;
     }
 }
 
 void MainWindow::on_pushButton_2_clicked()
 {
     QString fileName = QFileDialog::getOpenFileName(this,
-        tr("Open Image"), "/home/megarage9000/repos/CMPT365", tr("Image Files (*.png *.jpg *.bmp)"));
-    std::cout << "File name = " << fileName.toStdString() << std::endl;
+        tr("Open Image"), "/", tr("Image Files (*.png *.jpg *.bmp)"));
     file.calculateImages(fileName);
     QImage original = file.getOriginal();
     QImage grayScale = file.getGrayScale();
@@ -63,5 +61,22 @@ void MainWindow::on_pushButton_2_clicked()
 void MainWindow::on_pushButton_clicked()
 {
     setNewImagePair();
+}
+
+
+
+
+void MainWindow::on_pushButton_3_clicked()
+{
+    if(hasImage){
+        HistogramWindow * window = new HistogramWindow(currentImagePair[0], currentImagePair[1]);
+        window->show();
+    }
+}
+
+
+void MainWindow::on_pushButton_4_clicked()
+{
+    close();
 }
 

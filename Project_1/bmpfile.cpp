@@ -6,15 +6,11 @@ BMPFile::BMPFile() {
 
 void BMPFile::calculateImages(QString fileLocation) {
     imageFile = QImage(fileLocation).convertToFormat(QImage::Format_RGB32);
-    if(imageFile.isNull()) {
-        printf("Unable to to get image\n");
+    if(!imageFile.isNull()) {
+        calculateGrayScale();
+        calculateDither();
+        calculateAutoLevel();
     }
-    else {
-        printf("Got an image!\n");
-    }
-    calculateGrayScale();
-    calculateDither();
-    calculateAutoLevel();
 }
 BMPFile::BMPFile(QString fileLocation)
 {
@@ -190,25 +186,6 @@ void BMPFile::calculateAutoLevel() {
 QImage BMPFile::getAutoLevel() {
     return imageAutoLevel;
 }
-
-
-void BMPFile::getRgbIntensities(QImage * image,
-                       QVector<double> * red,
-                       QVector<double> * green,
-                       QVector<double> * blue) {
-
-    int imageWidth = image->width();
-    int imageHeight = image->height();
-    for(int y = 0; y < imageHeight; y++) {
-        QRgb * rgbVals = (QRgb*)image->constScanLine(y);
-        for(int x = 0; x < imageWidth; x++) {
-            (*red)[qRed(rgbVals[x])]++;
-            (*green)[qGreen(rgbVals[x])]++;
-            (*blue)[qBlue(rgbVals[x])]++;
-        }
-    }
-}
-
 
 QImage BMPFile::getOriginal(){
     return imageFile;

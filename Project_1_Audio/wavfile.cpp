@@ -1,8 +1,7 @@
 #include "wavfile.h"
 
-wavfile::wavfile(QString fileName)
+wavfile::wavfile()
 {
-    readWavFile(fileName);
 }
 
 template<class convertedType>
@@ -10,7 +9,7 @@ convertedType fromLittleEndian(QFile * file, int numBytes) {
     char * bits = new char[numBytes];
     file->read(bits, numBytes);
     convertedType result = qFromLittleEndian<convertedType>((uchar*)bits);
-    free(bits);
+    delete[] bits;
     return result;
 }
 
@@ -24,7 +23,7 @@ void wavfile::readWavFile(QString fileName) {
 
     cout << "Reading WavFile...\n" ;
 
-    // Read via: http://soundfile.sapp.org/doc/WaveFormat/
+    // Reading done via: http://soundfile.sapp.org/doc/WaveFormat/
 
     // RIFF Chunk descriptor
     cout << "RIFF chunkId = " << wavFile.read(4).data() << endl;
@@ -57,6 +56,8 @@ void wavfile::readWavFile(QString fileName) {
     amplitudes = QVector<double>(dataSizeInSamples);
     lowestAmplitude = 0;
     highestAmplitude = 0;
+
+    // For 2 byte reads
     if(numBytesToRead == 2) {
         for(int i = 0; i < dataSizeInSamples ; i++) {
             amplitudes[i] = fromLittleEndian<qint16_le>(&wavFile, numBytesToRead);
@@ -69,7 +70,9 @@ void wavfile::readWavFile(QString fileName) {
             }
         }
     }
-    else{
+    // For 4 byte reads
+    // - May need to reimplement to handle double channels
+    else if(numBytesToRead == 4){
         for(int i = 0; i < dataSizeInSamples ; i++) {
             amplitudes[i] = fromLittleEndian<qint32_le>(&wavFile, numBytesToRead);
             samples[i] = i;
@@ -87,6 +90,7 @@ void wavfile::readWavFile(QString fileName) {
 
 void wavfile::modifyData(float startingPercent, float endPercent, int startIndex, int endIndex, QVector<double> * dest){
     // We will increase the starting percent to end percent linearly
+    // for dB values, as it logarithmically modifies the amplitude
     int numSamples = endIndex - startIndex;
     double rate = (double)(endPercent - startingPercent) / numSamples;
     double currentRate = startingPercent + rate;
@@ -96,22 +100,6 @@ void wavfile::modifyData(float startingPercent, float endPercent, int startIndex
         currentRate += rate;
     }
 }
-
-void wavfile::normalizeDataAmplitudes(int start, int end){
-    int newRange = end - start;
-    int prevRange = highestAmplitude - lowestAmplitude;
-    for(int i = 0; i < dataSizeInSamples; i++) {
-        amplitudes[i] = (double)(amplitudes[i] / prevRange) * newRange;
-    }
-}
-
-void wavfile::normalizeDataSamples(int start, int end){
-    int newRange = end - start;
-    for(int i = 0; i < dataSizeInSamples; i++) {
-        samples[i] = (double)(samples[i] / dataSizeInSamples) * newRange;
-    }
-}
-
 
 QVector<double> wavfile::getSamples() {
     return samples;

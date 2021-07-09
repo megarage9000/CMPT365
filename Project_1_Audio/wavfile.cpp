@@ -121,4 +121,7 @@ int wavfile::getLowestAmplitude(){
     return lowestAmplitude;
 }
 
+int wavfile::getSamplesPerSecond() {
+    return sampleRate;
+}
 

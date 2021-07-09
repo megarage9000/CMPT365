@@ -28,5 +28,6 @@ private:
     QCustomPlot * plot;
     QCustomPlot * plot2;
     wavfile * file;
+    QCPTextElement * sampleRateOriginal, * sampleRateModified;
 };
 #endif // MAINWINDOW_H

@@ -17,6 +17,7 @@ public:
     int getDataSizeInSamples();
     int getLowestAmplitude();
     int getHighestAmplitude();
+    int getSamplesPerSecond();
 
 private:
     int numChannels;

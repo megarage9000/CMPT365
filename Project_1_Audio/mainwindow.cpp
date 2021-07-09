@@ -18,6 +18,14 @@ MainWindow::MainWindow(QWidget *parent)
     plot2->yAxis->setLabel("Amplitude");
     plot2->addGraph();
     plot2->graph(0)->setPen(QPen(Qt::red));
+
+    sampleRateOriginal =  new QCPTextElement(plot2, "", QFont("sans", 12, QFont::Bold));
+    plot2->plotLayout()->insertRow(0);
+    plot2->plotLayout()->addElement(0, 0, sampleRateOriginal);
+
+    sampleRateModified = new QCPTextElement(plot, "", QFont("sans", 12, QFont::Bold));
+    plot->plotLayout()->insertRow(0);
+    plot->plotLayout()->addElement(0, 0, sampleRateModified);
 }
 
 MainWindow::~MainWindow()
@@ -31,6 +39,7 @@ void MainWindow::plotWavFile() {
     int amplitudeRange = file->getHighestAmplitude() - file->getLowestAmplitude();
 
     // Calculating & plotting the modified wav file
+    sampleRateModified->setText("Sampling rate = " + QString::number(file->getSamplesPerSecond()) + " Samples per second");
     QVector<double> modifiedAmplitudes = QVector<double>(numSamples);
     QVector<double> samples = file->getSamples();
     // Calculating fade in from -20db -> 0db
@@ -42,6 +51,7 @@ void MainWindow::plotWavFile() {
     plot->xAxis->setRange(-.5 * numSamples, 1.5 * numSamples);
 
     // Plotting the original data
+    sampleRateOriginal->setText("Sampling rate " + QString::number(file->getSamplesPerSecond()) + " Samples per second");
     QVector<double> amplitudes = file->getAmplitudes();
     plot2->graph(0)->setData(samples, amplitudes);
     plot2->yAxis->setRange(-1.5 * amplitudeRange, 1.5 * amplitudeRange);

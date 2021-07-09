@@ -29,7 +29,7 @@ void MainWindow::setNewImagePair() {
         currentImagePair[1] = imagePairs[index][1];
         loadImagesToLabels(currentImagePair[0], currentImagePair[1]);
         index++;
-        if(index > 2) {
+        if(index > 3) {
             index = 0;
         }
     }
@@ -47,13 +47,16 @@ void MainWindow::on_pushButton_2_clicked()
     QImage autoLevel = file.getAutoLevel();
 
     imagePairs[0][0] = original.copy();
-    imagePairs[0][1] = grayScale.copy();
+    imagePairs[0][1] = QImage();
 
-    imagePairs[1][0] = grayScale.copy();
-    imagePairs[1][1] = dither.copy();
+    imagePairs[1][0] = original.copy();
+    imagePairs[1][1] = grayScale.copy();
 
-    imagePairs[2][0] = original.copy();
-    imagePairs[2][1] = autoLevel.copy();
+    imagePairs[2][0] = grayScale.copy();
+    imagePairs[2][1] = dither.copy();
+
+    imagePairs[3][0] = original.copy();
+    imagePairs[3][1] = autoLevel.copy();
     hasImage = true;
     setNewImagePair();
 }

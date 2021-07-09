@@ -45,7 +45,7 @@ private:
     QLabel * imageDisplay2;
 
     // Tracking image pairs
-    QImage imagePairs[3][2];
+    QImage imagePairs[4][2];
     QImage currentImagePair[2];
     int index = 0;
     bool hasImage = false;

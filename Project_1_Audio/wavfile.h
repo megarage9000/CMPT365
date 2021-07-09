@@ -12,12 +12,17 @@ public:
     wavfile();
     void readWavFile(QString fileName);
     void modifyData(float startingPercent, float endPercent, int startIndex, int endIndex, QVector<double> * dest);
+    void modifyDataStereo(float startingPercent, float endPercent, int startIndex, int endIndex, QVector<double> * dest, QVector<double> * dest2);
     QVector<double> getSamples();
     QVector<double> getAmplitudes();
+    QVector<double> getAmplitudes2();
     int getDataSizeInSamples();
     int getLowestAmplitude();
     int getHighestAmplitude();
     int getSamplesPerSecond();
+    bool isStereo();
+    template<class T>
+    void readSamples(QFile * wavFile, int numBytesToRead);
 
 private:
     int numChannels;
@@ -34,6 +39,9 @@ private:
     QVector<double> samples;
     // The actual sample data
     QVector<double> amplitudes;
+    // If it is stereo
+    QVector<double> amplitudes2;
+
 };
 
 #endif // WAVFILE_H

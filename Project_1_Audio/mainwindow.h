@@ -19,9 +19,18 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     void plotWavFile();
+    void toggleVisiblity(QCustomPlot * plot, int index);
 
 private slots:
     void on_pushButton_clicked();
+
+    void on_pushButton_2_clicked();
+
+    void on_pushButton_3_clicked();
+
+    void on_pushButton_5_clicked();
+
+    void on_pushButton_4_clicked();
 
 private:
     Ui::MainWindow *ui;
@@ -29,5 +38,6 @@ private:
     QCustomPlot * plot2;
     wavfile * file;
     QCPTextElement * sampleRateOriginal, * sampleRateModified;
+    bool isStereo;
 };
 #endif // MAINWINDOW_H

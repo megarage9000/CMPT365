@@ -52,29 +52,30 @@ void wavfile::readWavFile(QString fileName) {
 
     int numBytesToRead = bitsPerSample / 8;
     dataSizeInSamples = dataSize / numBytesToRead;
-    samples = QVector<double>(dataSizeInSamples);
-    amplitudes = QVector<double>(dataSizeInSamples);
     lowestAmplitude = 0;
     highestAmplitude = 0;
 
     // For 2 byte reads
     if(numBytesToRead == 2) {
-        for(int i = 0; i < dataSizeInSamples ; i++) {
-            amplitudes[i] = fromLittleEndian<qint16_le>(&wavFile, numBytesToRead);
-            samples[i] = i;
-            if(amplitudes[i] > highestAmplitude) {
-                highestAmplitude = amplitudes[i];
-            }
-            if(amplitudes[i] < lowestAmplitude) {
-                lowestAmplitude = amplitudes[i];
-            }
-        }
+        readSamples<qint16_le>(&wavFile, numBytesToRead);
     }
     // For 4 byte reads
-    // - May need to reimplement to handle double channels
     else if(numBytesToRead == 4){
+        readSamples<qint32_le>(&wavFile, numBytesToRead);
+    }
+    wavFile.close();
+}
+template<class T>
+void wavfile::readSamples(QFile * wavFile, int numBytesToRead){
+    // For Stereo reads
+    if(isStereo()) {
+        dataSizeInSamples = dataSizeInSamples / 2;
+        samples = QVector<double>(dataSizeInSamples);
+        amplitudes = QVector<double>(dataSizeInSamples);
+        amplitudes2 = QVector<double>(dataSizeInSamples);
         for(int i = 0; i < dataSizeInSamples ; i++) {
-            amplitudes[i] = fromLittleEndian<qint32_le>(&wavFile, numBytesToRead);
+            amplitudes[i] = fromLittleEndian<T>(wavFile, numBytesToRead);
+            amplitudes2[i] = fromLittleEndian<T>(wavFile, numBytesToRead);
             samples[i] = i;
             if(amplitudes[i] > highestAmplitude) {
                 highestAmplitude = amplitudes[i];
@@ -84,7 +85,21 @@ void wavfile::readWavFile(QString fileName) {
             }
         }
     }
-    wavFile.close();
+    // For Mono reads
+    else {
+        samples = QVector<double>(dataSizeInSamples);
+        amplitudes = QVector<double>(dataSizeInSamples);
+        for(int i = 0; i < dataSizeInSamples ; i++) {
+            amplitudes[i] = fromLittleEndian<T>(wavFile, numBytesToRead);
+            samples[i] = i;
+            if(amplitudes[i] > highestAmplitude) {
+                highestAmplitude = amplitudes[i];
+            }
+            if(amplitudes[i] < lowestAmplitude) {
+                lowestAmplitude = amplitudes[i];
+            }
+        }
+    }
 }
 
 
@@ -100,6 +115,18 @@ void wavfile::modifyData(float startingPercent, float endPercent, int startIndex
         currentRate += rate;
     }
 }
+void wavfile::modifyDataStereo(float startingPercent, float endPercent, int startIndex, int endIndex, QVector<double> * dest, QVector<double> * dest2){
+    int numSamples = endIndex - startIndex;
+    double rate = (double)(endPercent - startingPercent) / numSamples;
+    double currentRate = startingPercent + rate;
+    for(int i = startIndex; i < endIndex; i++) {
+        double log = pow(10.0, (currentRate / 20.0));
+        (*dest)[i] = (amplitudes[i] * log);
+        (*dest2)[i] = (amplitudes2[i] * log);
+        currentRate += rate;
+    }
+}
+
 
 QVector<double> wavfile::getSamples() {
     return samples;
@@ -107,6 +134,10 @@ QVector<double> wavfile::getSamples() {
 
 QVector<double> wavfile::getAmplitudes() {
     return amplitudes;
+}
+
+QVector<double> wavfile::getAmplitudes2() {
+    return amplitudes2;
 }
 
 int wavfile::getDataSizeInSamples(){
@@ -123,5 +154,9 @@ int wavfile::getLowestAmplitude(){
 
 int wavfile::getSamplesPerSecond() {
     return sampleRate;
+}
+
+bool wavfile::isStereo() {
+    return (numChannels == 2);
 }
 

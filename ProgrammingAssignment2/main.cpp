@@ -9,13 +9,14 @@
 
 
 std::vector<std::vector<char>> getHuffmanDictionary(int numSymbols, std::istream * input) {
-    // Creating the dictionary
     std::string fileInput;
     int maxCodeLength = 0;
     int inputLength = 0;
+
+    // Searching largest codelength as well as
+    // gathering symbols and their respective codes
     char symbols[26];
     std::string codes[26];
-
     for(int i = 0; i < numSymbols; i++) {
         std::getline(*input, fileInput);
         inputLength = fileInput.length();
@@ -23,23 +24,31 @@ std::vector<std::vector<char>> getHuffmanDictionary(int numSymbols, std::istream
 
         int j = 1;
         while(std::isspace(fileInput[j])){j++;}
-        int binaryLength = inputLength - j;
+        int binaryLength = inputLength - j - 1;
         if(binaryLength > maxCodeLength){
             maxCodeLength = binaryLength;
         }
         codes[i] = fileInput.substr(j, (binaryLength)); 
+        std::cout << symbols[i] << ": " << codes[i] << std::endl;
     }
 
+    std::cout << "Max code length = " << maxCodeLength << std::endl;
+
+
+    // Creating the dictionary and setting the boundaries per symbol
     int maxNumEntries = pow(2, maxCodeLength);
     std::vector<std::vector<char>> huffmanDec(maxNumEntries, {' ', ' '});
 
     for(int i = 0; i < numSymbols; i++) {
         int length = codes[i].length();
-        int value = std::stoi(codes[i]) << ((maxCodeLength - length) + 1);
+        long value = std::stoi(codes[i], nullptr, 2); 
+        value = value << (maxCodeLength - length);
+        std::cout << codes[i] << ": " << value << std::endl;
         huffmanDec[value][0] = symbols[i];
-        huffmanDec[value][1] = '0' + (length - 1);
+        huffmanDec[value][1] = '0' + (length);
     }
 
+    // Filling the values in between the boundaries
     char initialSymbol = huffmanDec[0][0];
     char initialLength = huffmanDec[0][1];
     for(int i = 0; i < maxNumEntries; i++) {
@@ -60,7 +69,7 @@ std::vector<std::vector<char>> getHuffmanDictionary(int numSymbols, std::istream
     return huffmanDec;
 }
 
-void HuffmanDecoding(std::string filename) {
+int HuffmanDecoding(std::string filename) {
     std::ifstream input(filename);
     if(input.is_open()) {
         
@@ -74,14 +83,12 @@ void HuffmanDecoding(std::string filename) {
         int numSymbols = std::stoi(fileInput);
         std::cout << numSymbols << std::endl;
 
-        
         std::vector<std::vector<char>> dec = getHuffmanDictionary(numSymbols, &input);
-
-
         std::getline(input, fileInput);
-        int code = stoi(fileInput);
-        std::cout << code << std::endl;
+        std::cout << fileInput << std::endl;
     }
+
+    return -1;
 }
 
 

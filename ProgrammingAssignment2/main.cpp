@@ -6,11 +6,8 @@
 #include <vector>
 
 // Huffman Decoding
-
-
-std::vector<std::vector<char>> getHuffmanDictionary(int numSymbols, std::istream * input) {
+std::vector<std::vector<char>> getHuffmanDictionary(int numSymbols, std::istream * input, int * maxCodeLength) {
     std::string fileInput;
-    int maxCodeLength = 0;
     int inputLength = 0;
 
     // Searching largest codelength as well as
@@ -25,24 +22,24 @@ std::vector<std::vector<char>> getHuffmanDictionary(int numSymbols, std::istream
         int j = 1;
         while(std::isspace(fileInput[j])){j++;}
         int binaryLength = inputLength - j - 1;
-        if(binaryLength > maxCodeLength){
-            maxCodeLength = binaryLength;
+        if(binaryLength > *maxCodeLength){
+            *maxCodeLength = binaryLength;
         }
         codes[i] = fileInput.substr(j, (binaryLength)); 
         std::cout << symbols[i] << ": " << codes[i] << std::endl;
     }
 
-    std::cout << "Max code length = " << maxCodeLength << std::endl;
+    std::cout << "Max code length = " << *maxCodeLength << std::endl;
 
 
     // Creating the dictionary and setting the boundaries per symbol
-    int maxNumEntries = pow(2, maxCodeLength);
+    int maxNumEntries = pow(2, *maxCodeLength);
     std::vector<std::vector<char>> huffmanDec(maxNumEntries, {' ', ' '});
 
     for(int i = 0; i < numSymbols; i++) {
         int length = codes[i].length();
         long value = std::stoi(codes[i], nullptr, 2); 
-        value = value << (maxCodeLength - length);
+        value = value << (*maxCodeLength - length);
         std::cout << codes[i] << ": " << value << std::endl;
         huffmanDec[value][0] = symbols[i];
         huffmanDec[value][1] = '0' + (length);
@@ -69,13 +66,14 @@ std::vector<std::vector<char>> getHuffmanDictionary(int numSymbols, std::istream
     return huffmanDec;
 }
 
+
+
 int HuffmanDecoding(std::string filename) {
     std::ifstream input(filename);
     if(input.is_open()) {
         
         std::string fileInput;
-        std::string output;
-        int outputIndex = 0;
+        std::string output = "";
 
 
         // Get number of symbols
@@ -83,9 +81,43 @@ int HuffmanDecoding(std::string filename) {
         int numSymbols = std::stoi(fileInput);
         std::cout << numSymbols << std::endl;
 
-        std::vector<std::vector<char>> dec = getHuffmanDictionary(numSymbols, &input);
+        int maxCodeLength = 0;
+        std::vector<std::vector<char>> dec = getHuffmanDictionary(numSymbols, &input, &maxCodeLength);
         std::getline(input, fileInput);
         std::cout << fileInput << std::endl;
+
+        
+        int tableValue = std::stoi(fileInput.substr(0, maxCodeLength), nullptr, 2);
+        int outputIndex = 0;
+        int maxLength = fileInput.length();
+        int fileInputIndex = maxCodeLength;
+        do {
+
+            output += dec[tableValue][0];
+            int bitLength = dec[tableValue][1] - '0';
+            std::cout << "Current string = " << output << ", last used table value = " << tableValue <<
+            " bit length = " << bitLength << std::endl;
+            tableValue = tableValue << bitLength;
+            std::cout << "tableValue = " << tableValue << std::endl;
+            if(fileInputIndex >= maxLength) {
+                break;
+            }
+            std::string substring = fileInput.substr(fileInputIndex, bitLength);
+            int newBits = stoi(substring, nullptr, 2);
+            int length = substring.length();
+            if(length < bitLength) {
+                std::cout << "Not long enough!" << std::endl;
+                newBits = newBits << (bitLength - length + 1);
+            }
+            std::cout << "tableValue = " << tableValue << std::endl;
+            tableValue |= newBits;
+            std::cout << "tableValue = " << tableValue << std::endl;
+            tableValue = tableValue & 7;
+            std::cout << "tableValue = " << tableValue << std::endl;
+            fileInputIndex += bitLength;
+        } while(true);
+ 
+        std::cout << output << std::endl;
     }
 
     return -1;

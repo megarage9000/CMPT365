@@ -5,7 +5,7 @@
 #include  <tgmath.h> 
 #include <vector>
 
-// Huffman Decoding
+// --- Huffman Decoding --- 
 std::vector<std::vector<char>> getHuffmanDictionary(int numSymbols, std::istream * input, int * maxCodeLength) {
     std::string fileInput;
     int inputLength = 0;
@@ -26,13 +26,12 @@ std::vector<std::vector<char>> getHuffmanDictionary(int numSymbols, std::istream
             *maxCodeLength = binaryLength;
         }
         codes[i] = fileInput.substr(j, (binaryLength)); 
-        std::cout << symbols[i] << ": " << codes[i] << std::endl;
     }
 
-    std::cout << "Max code length = " << *maxCodeLength << std::endl;
 
 
-    // Creating the dictionary and setting the boundaries per symbol
+    // Creating the dictionary and setting the boundaries per symbol,
+    // using vector for simplicity
     int maxNumEntries = pow(2, *maxCodeLength);
     std::vector<std::vector<char>> huffmanDec(maxNumEntries, {' ', ' '});
 
@@ -40,7 +39,6 @@ std::vector<std::vector<char>> getHuffmanDictionary(int numSymbols, std::istream
         int length = codes[i].length();
         long value = std::stoi(codes[i], nullptr, 2); 
         value = value << (*maxCodeLength - length);
-        std::cout << codes[i] << ": " << value << std::endl;
         huffmanDec[value][0] = symbols[i];
         huffmanDec[value][1] = '0' + (length);
     }
@@ -59,10 +57,6 @@ std::vector<std::vector<char>> getHuffmanDictionary(int numSymbols, std::istream
         }
     }
 
-    for(int i = 0; i < maxNumEntries; i++){
-        std::cout << i << ": (" << huffmanDec[i][0] << ", " << huffmanDec[i][1] << ")\n"; 
-    }
-
     return huffmanDec;
 }
 
@@ -76,7 +70,7 @@ int readBitsFromSubstr(std::string binaryString, int * startIndex, int length) {
         int substringLength = substring.length();
         *startIndex += substringLength;
         if(substringLength < length) {
-            // Right shifting so it returns the right amount of bits
+            // Right shifting so it returns the right amount of bits (padding)
             return std::stoi(substring, nullptr, 2) << ((length - substringLength));
         }
         else {
@@ -88,90 +82,135 @@ int readBitsFromSubstr(std::string binaryString, int * startIndex, int length) {
 int HuffmanDecoding(std::string filename) {
     std::ifstream input(filename);
     if(input.is_open()) {
-        
-        std::string fileInput = "";
-        std::string output = "";
+        while(!input.eof()) {
+            std::string fileInput = "";
+            std::string output = "";
 
 
-        // Get number of symbols
-        std::getline(input, fileInput);
-        int numSymbols = std::stoi(fileInput);
-        std::cout << numSymbols << std::endl;
-        fileInput = "";
+            // Get number of symbols
+            std::getline(input, fileInput);
+            int numSymbols = std::stoi(fileInput);
 
-        int maxCodeLength = 0;
-        std::vector<std::vector<char>> dec = getHuffmanDictionary(numSymbols, &input, &maxCodeLength);
-        std::getline(input, fileInput);
-        std::cout << "Max code length = " << maxCodeLength << std::endl;
-        std::cout << fileInput << ": length = " << (int)fileInput.length() << std::endl;
-        std::cout << fileInput << "some random end" << std::endl;
-        std::cout << fileInput << std::endl;
-        
-        int rejectionBit = ~(-1 << maxCodeLength);
-        std::cout << "rejection bit = " << rejectionBit << std::endl;
+            // Generate table
+            int maxCodeLength = 0;
+            std::vector<std::vector<char>> dec = getHuffmanDictionary(numSymbols, &input, &maxCodeLength);
+            
+            // Getting the code, we use string for dynamic size, as storing in ints / longs
+            // are of fixed size
+            std::getline(input, fileInput);
+            
+            // Determining rejection bit
+            int rejectionBit = ~(-1 << maxCodeLength);
 
-        int fileInputIndex = 0;
-        int tableValue = readBitsFromSubstr(fileInput, &fileInputIndex, maxCodeLength);
-        do {
-            output += dec[tableValue][0];
-            int bitLength = dec[tableValue][1] - '0';
-            std::cout << "Current string = " << output << ", last used table value = " << tableValue <<
-            ", bit length = " << bitLength << ", index = " << fileInputIndex << std::endl;
-            std::cout << "tableValue = " << tableValue << std::endl;
-            tableValue = tableValue << bitLength;
-            int newBits = readBitsFromSubstr(fileInput, &fileInputIndex, bitLength);
-            if(newBits == -1) { 
-                tableValue = tableValue & rejectionBit;
-                int length = dec[tableValue][1] - '0';
-                if(length == bitLength) {
-                    std::cout << "tableValue = " << tableValue << std::endl;
-                    output += dec[tableValue][0];
-                    int bitLength = dec[tableValue][1] - '0';
-                    std::cout << "Current string = " << output << ", last used table value = " << tableValue <<
-                    ", bit length = " << bitLength << ", index = " << fileInputIndex << std::endl;
+            // Decoding the code
+            int fileInputIndex = 0;
+            int tableValue = readBitsFromSubstr(fileInput, &fileInputIndex, maxCodeLength);
+            do {
+                output += dec[tableValue][0];
+                int bitLength = dec[tableValue][1] - '0';
+                tableValue = tableValue << bitLength;
+                int newBits = readBitsFromSubstr(fileInput, &fileInputIndex, bitLength);
+
+                // if EOF, check for remaining bits if they are readable
+                if(newBits == -1) { 
+                    tableValue = tableValue & rejectionBit;
+                    int length = dec[tableValue][1] - '0';
+                    if(length == bitLength) {
+                        output += dec[tableValue][0];
+                    }
+                    break;
+                } else{
+                    tableValue = tableValue | newBits;
+                    tableValue = tableValue & rejectionBit;
                 }
-               break;
-            } else{
-                tableValue = tableValue | newBits;
-                std::cout << "tableValue = " << tableValue << std::endl;
-                tableValue = tableValue & rejectionBit;
-                std::cout << "tableValue = " << tableValue << std::endl;
-            }
-        } while(true);
- 
-        std::cout << output << std::endl;
+            } while(true);  
+            std::cout << output << std::endl;
+        }
         input.close();
     }
-
-    return -1;
+    else{
+        return -1;
+    }
+    return 0;
 }
 
+// --- LZW Encoding --- //
 
+std::vector<std::string> generateDictionary (int numSymbols, std::ifstream *input) {
+
+    std::vector<std::string> LZWDict;
+    std::string fileInput;
+    for(int i = 0; i < numSymbols; i++) {
+        std::getline(*input, fileInput);
+        int length = fileInput.length();
+        int j = 1;
+        while(std::isspace(fileInput[j])){++j;}
+        int size = length - j;
+        LZWDict.push_back(fileInput.substr(j, size));
+        std::cout << i << ": " << LZWDict[i] << std::endl;
+    }
+    return LZWDict;
+}
+
+int LZWDecoding(std::string fileName) {
+    std::ifstream input(fileName);
+    if(input.is_open()) {
+        while(!input.eof()) {
+            std::string fileInput;
+            std::string code;
+            int numSymbols;
+            std::vector<std::string> dict;
+
+            std::getline(input, fileInput);
+            code = fileInput;
+            std::cout << "code = " << code << std::endl;
+
+            std::getline(input, fileInput);
+            numSymbols = stoi(fileInput, nullptr, 10);
+            std::cout << "num symbols = " << numSymbols << std::endl;
+
+            dict = generateDictionary(numSymbols, &input);
+
+            std::string output = "";
+            std::string inputCharacters(1, code[0]);
+            int index = 1;
+            int maxLength = (int)code.length();
+            while(index < maxLength) {
+                
+                char nextChar = code[index];
+                std::string combination = inputCharacters;
+                combination += nextChar;
+                if(std::find(dict.begin(), dict.end(), combination) != dict.end()) {
+                    inputCharacters += nextChar;
+                }
+                else{
+                    auto match = std::find(dict.begin(), dict.end(), inputCharacters);
+                    int i = match - dict.begin();
+                    output += std::to_string(i);
+                    dict.push_back(combination);
+                    inputCharacters = std::string(1, nextChar);
+                }
+                index++;
+            }
+            auto match = std::find(dict.begin(), dict.end(), inputCharacters);
+            int i = match - dict.begin();
+            output += std::to_string(i);
+            std::cout << output << std::endl;
+            for(int i = 0; i < (int)dict.size(); i++) {
+                std::cout << i << ": " << dict[i] << std::endl;
+            }
+        }
+        input.close();
+    }
+    else{
+        return -1;
+    }
+    return 0;
+}
 
 
 int main(int argc, char * argv[]) {
     using namespace std;
-    // if(argc != 2) {
-    //     cout << "Usage: ./test [filename]\n"; 
-    // }
-    // else {
-    //     string line;
-    //     ifstream inputFile(argv[1]);
-    //     if(inputFile.is_open()) {
-    //         while(getline(inputFile, line)) {
-    //             cout << line << endl;
-    //         }
-    //     }
-    //     else {
-    //         cout << "Unable to open file\n";
-    //     }
-    // }
-    HuffmanDecoding(argv[1]);
-    // std::string random = "hello";
-
-    // for(int i = 0; i < (int)random.length(); i++) {
-    //     std::cout << "i: " << i << ", random[" << i << "] = " << random[i] << std::endl;
-    //     std::string substr = random.substr(0, i);
-    //     std::cout << "substr = " << substr << ", length = " << substr.length() << std::endl;
-    // }
+    //HuffmanDecoding(argv[1]);
+    LZWDecoding(argv[1]);
 }

@@ -2,8 +2,9 @@
 #include <fstream>
 #include <string>
 #include <algorithm>
-#include  <tgmath.h> 
+#include <tgmath.h> 
 #include <vector>
+#include <map>
 
 // --- Huffman Decoding --- 
 std::vector<std::vector<char>> getHuffmanDictionary(int numSymbols, std::istream * input, int * maxCodeLength) {
@@ -139,9 +140,9 @@ int HuffmanDecoding(std::string filename) {
 
 // --- LZW Encoding --- //
 
-std::vector<std::string> generateDictionary (int numSymbols, std::ifstream *input) {
+std::map<std::string, int> generateDictionary (int numSymbols, std::ifstream *input) {
 
-    std::vector<std::string> LZWDict;
+    std::map<std::string, int> LZWDict;
     std::string fileInput;
     for(int i = 0; i < numSymbols; i++) {
         std::getline(*input, fileInput);
@@ -149,7 +150,7 @@ std::vector<std::string> generateDictionary (int numSymbols, std::ifstream *inpu
         int j = 1;
         while(std::isspace(fileInput[j])){++j;}
         int size = length - j;
-        LZWDict.push_back(fileInput.substr(j, size));
+        LZWDict.insert(std::pair<std::string, int>(fileInput.substr(j, size), i));
     }
     return LZWDict;
 }
@@ -162,7 +163,7 @@ int LZWDecoding(std::string fileName) {
             std::string fileInput;
             std::string code;
             int numSymbols;
-            std::vector<std::string> dict;
+            std::map<std::string, int> dict;
 
             // Getting symbols to decode
             std::getline(input, fileInput);
@@ -185,32 +186,32 @@ int LZWDecoding(std::string fileName) {
                 std::string combination = inputCharacters;
                 combination += nextChar;
                 // if s + c exist
-                if(std::find(dict.begin(), dict.end(), combination) != dict.end()) {
+                if(dict.find(combination) != dict.end()) {
                     // s = s + c
                     inputCharacters += nextChar;
                 }
                 else{
                     // output s
-                    auto match = std::find(dict.begin(), dict.end(), inputCharacters);
-                    int i = match - dict.begin();
+                    int i = dict[inputCharacters];
                     output += std::to_string(i);
                     // add s + c to dictionary
-                    dict.push_back(combination);
+                    int newIndex = (int)dict.size();
+                    dict.insert(std::pair<std::string, int>(combination, newIndex));
                     // s = c
                     inputCharacters = std::string(1, nextChar);
                 }
                 index++;
             }
             // output s
-            auto match = std::find(dict.begin(), dict.end(), inputCharacters);
-            int i = match - dict.begin();
+            int i = dict[inputCharacters];
             output += std::to_string(i);
 
             std::cout << "-----------------\n";
             std::cout << "Sequence = " << output << std::endl;
             std::cout << "Final Dictionary\n";
-            for(int i = 0; i < (int)dict.size(); i++) {
-                std::cout << i << ": " << dict[i] << std::endl;
+            auto it = dict.begin();
+            for(; it != dict.end(); it++) {
+                std::cout << it->first << ": " << it->second << std::endl;
             }
             std::cout << "-----------------\n";
         }

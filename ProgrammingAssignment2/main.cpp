@@ -113,9 +113,11 @@ int HuffmanDecoding(std::string filename) {
                 // if EOF, check for remaining bits if they are readable
                 if(newBits == -1) { 
                     tableValue = tableValue & rejectionBit;
-                    int length = dec[tableValue][1] - '0';
-                    if(length == bitLength) {
-                        output += dec[tableValue][0];
+                    if(tableValue < (int)dec.size()){
+                        int length = dec[tableValue][1] - '0';
+                        if(length == bitLength) {
+                            output += dec[tableValue][0];
+                        }
                     }
                     break;
                 } else{

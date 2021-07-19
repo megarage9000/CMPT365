@@ -86,7 +86,6 @@ int HuffmanDecoding(std::string filename) {
             std::string fileInput = "";
             std::string output = "";
 
-
             // Get number of symbols
             std::getline(input, fileInput);
             int numSymbols = std::stoi(fileInput);
@@ -124,7 +123,9 @@ int HuffmanDecoding(std::string filename) {
                     tableValue = tableValue & rejectionBit;
                 }
             } while(true);  
-            std::cout << output << std::endl;
+            std::cout << "-----------------\n";
+            std::cout << "Sequence = " << output << std::endl;
+            std::cout << "-----------------\n";
         }
         input.close();
     }
@@ -147,7 +148,6 @@ std::vector<std::string> generateDictionary (int numSymbols, std::ifstream *inpu
         while(std::isspace(fileInput[j])){++j;}
         int size = length - j;
         LZWDict.push_back(fileInput.substr(j, size));
-        std::cout << i << ": " << LZWDict[i] << std::endl;
     }
     return LZWDict;
 }
@@ -156,49 +156,61 @@ int LZWDecoding(std::string fileName) {
     std::ifstream input(fileName);
     if(input.is_open()) {
         while(!input.eof()) {
+            // Declaring data
             std::string fileInput;
             std::string code;
             int numSymbols;
             std::vector<std::string> dict;
 
+            // Getting symbols to decode
             std::getline(input, fileInput);
             code = fileInput;
-            std::cout << "code = " << code << std::endl;
 
+            // Getting number of symbols in present dictionary
             std::getline(input, fileInput);
             numSymbols = stoi(fileInput, nullptr, 10);
-            std::cout << "num symbols = " << numSymbols << std::endl;
 
             dict = generateDictionary(numSymbols, &input);
 
+            // Decoding symbols
             std::string output = "";
             std::string inputCharacters(1, code[0]);
             int index = 1;
             int maxLength = (int)code.length();
+
             while(index < maxLength) {
-                
                 char nextChar = code[index];
                 std::string combination = inputCharacters;
                 combination += nextChar;
+                // if s + c exist
                 if(std::find(dict.begin(), dict.end(), combination) != dict.end()) {
+                    // s = s + c
                     inputCharacters += nextChar;
                 }
                 else{
+                    // output s
                     auto match = std::find(dict.begin(), dict.end(), inputCharacters);
                     int i = match - dict.begin();
                     output += std::to_string(i);
+                    // add s + c to dictionary
                     dict.push_back(combination);
+                    // s = c
                     inputCharacters = std::string(1, nextChar);
                 }
                 index++;
             }
+            // output s
             auto match = std::find(dict.begin(), dict.end(), inputCharacters);
             int i = match - dict.begin();
             output += std::to_string(i);
-            std::cout << output << std::endl;
+
+            std::cout << "-----------------\n";
+            std::cout << "Sequence = " << output << std::endl;
+            std::cout << "Final Dictionary\n";
             for(int i = 0; i < (int)dict.size(); i++) {
                 std::cout << i << ": " << dict[i] << std::endl;
             }
+            std::cout << "-----------------\n";
         }
         input.close();
     }
@@ -210,7 +222,10 @@ int LZWDecoding(std::string fileName) {
 
 
 int main(int argc, char * argv[]) {
-    using namespace std;
-    //HuffmanDecoding(argv[1]);
-    LZWDecoding(argv[1]);
+    if(argc < 3) {
+        std::cout << "Usage: ./test [huffman Input text file] [LZW Input text file]\n";
+        return -1;
+    }
+    HuffmanDecoding(argv[1]);
+    LZWDecoding(argv[2]);
 }

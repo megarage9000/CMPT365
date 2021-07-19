@@ -21,7 +21,7 @@ std::vector<std::vector<char>> getHuffmanDictionary(int numSymbols, std::istream
 
         int j = 1;
         while(std::isspace(fileInput[j])){j++;}
-        int binaryLength = inputLength - j - 1;
+        int binaryLength = inputLength - j;
         if(binaryLength > *maxCodeLength){
             *maxCodeLength = binaryLength;
         }
@@ -66,19 +66,18 @@ std::vector<std::vector<char>> getHuffmanDictionary(int numSymbols, std::istream
     return huffmanDec;
 }
 
-int readBitsFromSubstr(std::string binaryString, int startIndex, int length, int * newIndex) {
+int readBitsFromSubstr(std::string binaryString, int * startIndex, int length) {
     int binaryStringLength = (int)binaryString.length();
-    if(startIndex >= binaryStringLength) {
+    if(*startIndex >= binaryStringLength) {
         return -1;
     }
     else {
-        std::string substring = binaryString.substr(startIndex, length);
-        int substringLength = (int)substring.length();
-        *newIndex += substringLength;
+        std::string substring = binaryString.substr(*startIndex, length);
+        int substringLength = substring.length();
+        *startIndex += substringLength;
         if(substringLength < length) {
             // Right shifting so it returns the right amount of bits
-            return std::stoi(substring, nullptr, 2) << (length - substringLength);
-
+            return std::stoi(substring, nullptr, 2) << ((length - substringLength));
         }
         else {
             return std::stoi(substring, nullptr, 2);
@@ -90,7 +89,7 @@ int HuffmanDecoding(std::string filename) {
     std::ifstream input(filename);
     if(input.is_open()) {
         
-        std::string fileInput;
+        std::string fileInput = "";
         std::string output = "";
 
 
@@ -98,39 +97,50 @@ int HuffmanDecoding(std::string filename) {
         std::getline(input, fileInput);
         int numSymbols = std::stoi(fileInput);
         std::cout << numSymbols << std::endl;
+        fileInput = "";
 
         int maxCodeLength = 0;
         std::vector<std::vector<char>> dec = getHuffmanDictionary(numSymbols, &input, &maxCodeLength);
-        
         std::getline(input, fileInput);
-        std::cout << fileInput;
-        std::cout << ": length = " << (int)fileInput.length() << std::endl;
         std::cout << "Max code length = " << maxCodeLength << std::endl;
+        std::cout << fileInput << ": length = " << (int)fileInput.length() << std::endl;
+        std::cout << fileInput << "some random end" << std::endl;
+        std::cout << fileInput << std::endl;
         
         int rejectionBit = ~(-1 << maxCodeLength);
         std::cout << "rejection bit = " << rejectionBit << std::endl;
 
         int fileInputIndex = 0;
-        int tableValue = readBitsFromSubstr(fileInput, 0, maxCodeLength, &fileInputIndex);
-        int outputIndex = 0;
+        int tableValue = readBitsFromSubstr(fileInput, &fileInputIndex, maxCodeLength);
         do {
             output += dec[tableValue][0];
             int bitLength = dec[tableValue][1] - '0';
             std::cout << "Current string = " << output << ", last used table value = " << tableValue <<
             ", bit length = " << bitLength << ", index = " << fileInputIndex << std::endl;
-            int newBits = readBitsFromSubstr(fileInput, fileInputIndex, bitLength, &fileInputIndex);
-            if(newBits == -1) {
-                break;
-            }
+            std::cout << "tableValue = " << tableValue << std::endl;
             tableValue = tableValue << bitLength;
-            std::cout << "tableValue = " << tableValue << std::endl;
-            tableValue |= newBits;
-            std::cout << "tableValue = " << tableValue << std::endl;
-            tableValue = tableValue & rejectionBit;
-            std::cout << "tableValue = " << tableValue << std::endl;
+            int newBits = readBitsFromSubstr(fileInput, &fileInputIndex, bitLength);
+            if(newBits == -1) { 
+                tableValue = tableValue & rejectionBit;
+                int length = dec[tableValue][1] - '0';
+                if(length == bitLength) {
+                    std::cout << "tableValue = " << tableValue << std::endl;
+                    output += dec[tableValue][0];
+                    int bitLength = dec[tableValue][1] - '0';
+                    std::cout << "Current string = " << output << ", last used table value = " << tableValue <<
+                    ", bit length = " << bitLength << ", index = " << fileInputIndex << std::endl;
+                }
+               break;
+            } else{
+                tableValue = tableValue | newBits;
+                std::cout << "tableValue = " << tableValue << std::endl;
+                tableValue = tableValue & rejectionBit;
+                std::cout << "tableValue = " << tableValue << std::endl;
+            }
         } while(true);
  
         std::cout << output << std::endl;
+        input.close();
     }
 
     return -1;
@@ -157,4 +167,11 @@ int main(int argc, char * argv[]) {
     //     }
     // }
     HuffmanDecoding(argv[1]);
+    // std::string random = "hello";
+
+    // for(int i = 0; i < (int)random.length(); i++) {
+    //     std::cout << "i: " << i << ", random[" << i << "] = " << random[i] << std::endl;
+    //     std::string substr = random.substr(0, i);
+    //     std::cout << "substr = " << substr << ", length = " << substr.length() << std::endl;
+    // }
 }

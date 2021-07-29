@@ -29,8 +29,6 @@ std::vector<std::vector<char>> getHuffmanDictionary(int numSymbols, std::istream
         codes[i] = fileInput.substr(j, (binaryLength)); 
     }
 
-
-
     // Creating the dictionary and setting the boundaries per symbol,
     // using vector for simplicity
     int maxNumEntries = pow(2, *maxCodeLength);
@@ -121,7 +119,7 @@ int HuffmanDecoding(std::string filename) {
                         }
                     }
                     break;
-                } else{
+                } else {
                     tableValue = tableValue | newBits;
                     tableValue = tableValue & rejectionBit;
                 }

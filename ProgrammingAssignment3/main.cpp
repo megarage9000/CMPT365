@@ -72,9 +72,24 @@ std::vector<int> generateIntegerVectorFromString(std::string inputString) {
     return vectorToReturn;
 }
 
+std::vector<std::vector<int>> getTranspose(std::vector<std::vector<int>> inputMatrix) {
+    std::vector<std::vector<int>> transpose;
+
+    int rowLength = inputMatrix[0].capacity();
+    int colLength = inputMatrix.capacity();
+
+    for(int i = 0; i < colLength; i++) {
+        std::vector<int> newRow;
+        for(int j = 0; j < rowLength; j++) {
+            newRow.push_back(inputMatrix[j][i]);
+        }
+        transpose.push_back(newRow);
+    }
+    return transpose;
+}
+
 void dct(std::string fileName) {
     std::ifstream inputFileStream(fileName);
-    
 
     std::vector<std::vector<int>> matrix;
 
@@ -93,6 +108,17 @@ void dct(std::string fileName) {
         int colLength = matrix[i].capacity();
         for(int j = 0; j < colLength; j++) {
             std::cout << matrix[i][j] << " ";
+        }
+        std::cout << std::endl;
+    }
+
+    std::cout << "Transpose:\n";
+    std::vector<std::vector<int>> transpose = getTranspose(matrix);
+    int numRowsT = transpose.capacity();
+    for(int i = 0; i < numRowsT; i++) {
+        int colLengthT = transpose[i].capacity();
+        for(int j = 0; j < colLengthT; j++) {
+            std::cout << transpose[i][j] << " ";
         }
         std::cout << std::endl;
     }

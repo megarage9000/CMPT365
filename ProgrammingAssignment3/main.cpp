@@ -56,14 +56,50 @@ void arithmeticCoding(std::string fileName) {
 
 // --- Discrete Cosine Transform --- 
 std::vector<int> generateIntegerVectorFromString(std::string inputString) {
-
+    int length = inputString.length();
+    int num = 0;
+    std::vector<int> vectorToReturn;
+    for(int i = 0; i < length; i++ ) {
+        if(std::isspace(inputString[i])){
+           vectorToReturn.push_back(num); 
+           num = 0;
+        }
+        else{
+            num = (num * 10) + (inputString[i] - '0');
+        }
+    } 
+    vectorToReturn.push_back(num);   
+    return vectorToReturn;
 }
 
 void dct(std::string fileName) {
+    std::ifstream inputFileStream(fileName);
+    
 
+    std::vector<std::vector<int>> matrix;
+
+    if(inputFileStream.is_open()) {
+        while(!inputFileStream.eof()) {
+            std::string inputString = "";
+            std::getline(inputFileStream, inputString);
+            
+            matrix.push_back(generateIntegerVectorFromString(inputString));
+        }
+        inputFileStream.close();
+    }
+
+    int numRows = matrix.capacity();
+    for(int i = 0; i < numRows; i++) {
+        int colLength = matrix[i].capacity();
+        for(int j = 0; j < colLength; j++) {
+            std::cout << matrix[i][j] << " ";
+        }
+        std::cout << std::endl;
+    }
 }
 
 
 int main(int argc, char * argv[]) {
-    arithmeticCoding(argv[1]);
+   // arithmeticCoding(argv[1]);
+   dct(argv[1]);
 }

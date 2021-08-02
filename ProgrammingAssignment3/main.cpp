@@ -29,6 +29,7 @@ void arithmeticCoding(std::string fileName) {
     if(inputFileStream.is_open()) {
         std::string fileInput = "";
         while(!inputFileStream.eof()){
+            std::cout << std::setprecision(MAX_NUM_DECIMALS);
             std::cout << "############################\n";
             long double low = 0.0;
             long double high = 1.0;
@@ -45,11 +46,11 @@ void arithmeticCoding(std::string fileName) {
             // Decoding occurs here
             for(int i = 0; i < codeLength; i++) {
                 char symbol = fileInput[i];
-                std::cout << "Symbol at position " << i << ": " << symbol << '\n';
+                //std::cout << "Symbol at position " << i << ": " << symbol << '\n';
                 decodeArithmeticSymbol(symbol, &low, &high, &range, rangeA, rangeB);
-                std::cout << std::setprecision(MAX_NUM_DECIMALS) << "Range = [" << low << ", " << high << ")\n";
+                //std::cout << "Range = [" << low << ", " << high << ")\n";
             }
-            std::cout << "---------------------------\n";
+            //std::cout << "---------------------------\n";
             std::cout << "Final Range:\n" << "Range = [" << low << ", " << high << ")\n";
             std::cout << "############################\n";
         }
@@ -148,6 +149,7 @@ void dct(std::string fileName) {
         std::cout << "Matrix is not square!\n";
         return;
     }
+    std::cout<< std::setprecision(4);
     std::cout << "N = " << N << "\n";
     std::cout << "---------------------------\n";
     std::cout << "Matrix before DCT:\n";
@@ -189,7 +191,7 @@ void dct(std::string fileName) {
     std::vector<std::vector<double>> transformationColRow = transformMatrix(transformMatrix(transform, matrix, N), 
                                                         transformTranspose, N);
     // T_TransposeXT (Row -> Col Transform)
-    std::vector<std::vector<double>> transformationRowCol = transformMatrix(transformMatrix(transformTranspose, matrix, N), 
+    std::vector<std::vector<double>> transformationRowCol = transformMatrix(transformMatrix(matrix, transformTranspose, N), 
     transform, N);
     std::cout << "---------------------------\n";
     std::cout << "Matrix after DCT (Column transformation -> Row transformation):\n";
@@ -217,10 +219,7 @@ int main(int argc, char * argv[]) {
         std::cout << "usage: ./test {Arithmetic Encoding Input Text File} {Discrete Cosine Transformation Input Text File}\n";
         return 1;
     }
-   arithmeticCoding(argv[1]);
-   dct(argv[2]);
-   return 0;
-    //std::cout << dctTransform(2, 2, 4);
-    //For testing multiplication
-
+    arithmeticCoding(argv[1]);
+    dct(argv[2]);
+    return 0;
 }

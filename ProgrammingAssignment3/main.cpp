@@ -2,7 +2,7 @@
 #include <fstream>
 #include <vector>
 #include <map>
-#include <tgmath.h>
+#include <cmath>
 
 // --- Arithmetic decoding --- 
 const char CHAR_A = 'A';
@@ -90,8 +90,8 @@ std::vector<std::vector<double>> getTranspose(std::vector<std::vector<double>> i
 }
 
 double dctTransform(int i, int j, int n) {
-    double a = (i == 0) ? (sqrt((double)1 / n)) : (sqrt((double)2 / n));
-    double numerator = ((2 * j  + 1) * i * M_1_PI);
+    double a = (i == 0) ? (sqrt(1.0 / n)) : (sqrt(2.0 / n));
+    double numerator = ((2 * j  + 1) * i * M_PI);
     double denominator = (2 * n);
     return a * cos(numerator / denominator);
 }
@@ -134,6 +134,7 @@ void dct(std::string fileName) {
 
     // Get transformation matrices
     int N = matrix[0].capacity();
+    std::cout << "N = " << N << "\n";
     for(int i = 0; i < N; i++) {
         std::vector<double> newRow;
         for(int j = 0; j < N; j++) {
@@ -142,42 +143,55 @@ void dct(std::string fileName) {
         transform.push_back(newRow);
     }
     transformTranspose = getTranspose(transform);
+    std::cout << "---------------------------\n";
     std::cout << "Transform Matrix:\n";
     for(int i = 0; i < N; i++) {
         for(int j = 0; j < N; j++) {
             std::cout << transform[i][j] << " ";
         }
-        std::cout << std::endl;
+        std::cout << "\n";
     }
+    std::cout << "---------------------------\n";
     std::cout << "Transform Matrix Transpose:\n";
     for(int i = 0; i < N; i++) {
         for(int j = 0; j < N; j++) {
             std::cout << transformTranspose[i][j] << " ";
         }
-        std::cout << std::endl;
+        std::cout << "\n";
     }
 
     // Apply transformations
-    // -- Column
-    std::vector<std::vector<double>> transformationA = transformMatrix(transform, matrix, N);
-    // -- Row
-    std::vector<std::vector<double>> transformationB = transformMatrix(transformationA, transformTranspose, N);
-
+    // TXT_Transpose (Col -> Row Transform)
+    std::vector<std::vector<double>> transformationColRow = transformMatrix(transformMatrix(transform, matrix, N), 
+                                                        transformTranspose, N);
+    // T_TransposeXT (Row -> Col Transform)
+    std::vector<std::vector<double>> transformationRowCol = transformMatrix(transformMatrix(transformTranspose, matrix, N), 
+    transform, N);
+    std::cout << "---------------------------\n";
     std::cout << "Matrix before DCT:\n";
     for(int i = 0; i < N; i++) {
         for(int j = 0; j < N; j++) {
             std::cout << matrix[i][j] << " ";
         }
-        std::cout << std::endl;
+        std::cout << "\n";
     }
-
-    std::cout << "Matrix after DCT:\n";
+    std::cout << "---------------------------\n";
+    std::cout << "Matrix after DCT (Column transformation -> Row transformation):\n";
     for(int i = 0; i < N; i++) {
         for(int j = 0; j < N; j++) {
-            std::cout << (int)transformationB[i][j] << " ";
+            std::cout << (int)transformationColRow[i][j] << " ";
         }
-        std::cout << std::endl;
+        std::cout << "\n";
     }
+    std::cout << "---------------------------\n";
+    std::cout << "Matrix after DCT (Row transformation -> Column transformation):\n";
+    for(int i = 0; i < N; i++) {
+        for(int j = 0; j < N; j++) {
+            std::cout << (int)transformationColRow[i][j] << " ";
+        }
+        std::cout << "\n";
+    }
+    std::cout << "---------------------------\n";
    
 }
 
@@ -186,27 +200,6 @@ int main(int argc, char * argv[]) {
    //arithmeticCoding(argv[1]);
    dct(argv[1]);
     //std::cout << dctTransform(2, 2, 4);
-// For testing multiplication
-//    std::vector<std::vector<int>> a = {
-//        {1, 2, 4, 6},
-//        {5, 7, 8, 0},
-//        {2, 3, 5, 8},
-//        {2, 5, 10, 11}
-//    };
-//    std::vector<std::vector<int>> b = {
-//        {6, 23, 1, 3},
-//        {21, 0, 8, 9},
-//        {9, 8, 10, 11},
-//        {7, 6, 2, 1}
-//    };
-   
-//    std::vector<std::vector<int>> result = transformMatrix(a, b, 4);
-
-//     for(int i = 0; i < 4; i++) {
-//         for(int j = 0; j < 4; j++) {
-//             std::cout << result[i][j] << " ";
-//         }
-//         std::cout << "\n";
-//     }
+    //For testing multiplication
 
 }

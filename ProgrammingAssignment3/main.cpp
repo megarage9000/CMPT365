@@ -3,10 +3,12 @@
 #include <vector>
 #include <map>
 #include <cmath>
+#include <iomanip>
 
 // --- Arithmetic decoding --- 
 const char CHAR_A = 'A';
 const char CHAR_B = 'B';
+const int MAX_NUM_DECIMALS = 50;
 
 void decodeArithmeticSymbol(char symbol, long double * low, long double * high, long double * range, const double rangeA[2], const double rangeB[2]) {
     // Use encoding algorithm found in slide 56 of Lecture 5
@@ -22,13 +24,12 @@ void decodeArithmeticSymbol(char symbol, long double * low, long double * high, 
 }
 
 void arithmeticCoding(std::string fileName) {
-
     std::ifstream inputFileStream(fileName);
 
     if(inputFileStream.is_open()) {
         std::string fileInput = "";
         while(!inputFileStream.eof()){
-
+            std::cout << "############################\n";
             long double low = 0.0;
             long double high = 1.0;
             long double range = low + high;
@@ -37,6 +38,7 @@ void arithmeticCoding(std::string fileName) {
 
             std::getline(inputFileStream, fileInput);
             std::cout << "Range to decode: " << fileInput << '\n';
+            std::cout << "---------------------------\n";
 
             int codeLength = fileInput.length();
 
@@ -45,9 +47,11 @@ void arithmeticCoding(std::string fileName) {
                 char symbol = fileInput[i];
                 std::cout << "Symbol at position " << i << ": " << symbol << '\n';
                 decodeArithmeticSymbol(symbol, &low, &high, &range, rangeA, rangeB);
-                std::cout << "Range = [" << low << ", " << high << ")\n";
+                std::cout << std::setprecision(MAX_NUM_DECIMALS) << "Range = [" << low << ", " << high << ")\n";
             }
+            std::cout << "---------------------------\n";
             std::cout << "Final Range:\n" << "Range = [" << low << ", " << high << ")\n";
+            std::cout << "############################\n";
         }
 
         inputFileStream.close();
@@ -56,6 +60,7 @@ void arithmeticCoding(std::string fileName) {
 }
 
 // --- Discrete Cosine Transform --- 
+// Get a vector double from an string of space separated numbers
 std::vector<double> generateIntegerVectorFromString(std::string inputString) {
     int length = inputString.length();
     double num = 0;
@@ -73,6 +78,7 @@ std::vector<double> generateIntegerVectorFromString(std::string inputString) {
     return vectorToReturn;
 }
 
+// Transposes a vector double matrix
 std::vector<std::vector<double>> getTranspose(std::vector<std::vector<double>> inputMatrix) {
     std::vector<std::vector<double>> transpose;
 
@@ -89,6 +95,7 @@ std::vector<std::vector<double>> getTranspose(std::vector<std::vector<double>> i
     return transpose;
 }
 
+// Returns appropriate dct transform value according to i, j and n
 double dctTransform(int i, int j, int n) {
     double a = (i == 0) ? (sqrt(1.0 / n)) : (sqrt(2.0 / n));
     double numerator = ((2 * j  + 1) * i * M_PI);
@@ -96,6 +103,7 @@ double dctTransform(int i, int j, int n) {
     return a * cos(numerator / denominator);
 }
 
+// Multiplies 2 vector double matrices, returns a new matrix as a result
 std::vector<std::vector<double>> transformMatrix(std::vector<std::vector<double>> matrixA, std::vector<std::vector<double>> matrixB, int dimension) {
     std::vector<std::vector<double>> resultMatrix;
     for(int row = 0; row < dimension; row++) {
@@ -131,10 +139,26 @@ void dct(std::string fileName) {
         }
         inputFileStream.close();
     }
+    else{
+        return;
+    }
+    std::cout << "############################\n";
+    int N = matrix[0].size();
+    if(N != (int)matrix.size()) {
+        std::cout << "Matrix is not square!\n";
+        return;
+    }
+    std::cout << "N = " << N << "\n";
+    std::cout << "---------------------------\n";
+    std::cout << "Matrix before DCT:\n";
+    for(int i = 0; i < N; i++) {
+        for(int j = 0; j < N; j++) {
+            std::cout << matrix[i][j] << " ";
+        }
+        std::cout << "\n";
+    }
 
     // Get transformation matrices
-    int N = matrix[0].capacity();
-    std::cout << "N = " << N << "\n";
     for(int i = 0; i < N; i++) {
         std::vector<double> newRow;
         for(int j = 0; j < N; j++) {
@@ -168,14 +192,6 @@ void dct(std::string fileName) {
     std::vector<std::vector<double>> transformationRowCol = transformMatrix(transformMatrix(transformTranspose, matrix, N), 
     transform, N);
     std::cout << "---------------------------\n";
-    std::cout << "Matrix before DCT:\n";
-    for(int i = 0; i < N; i++) {
-        for(int j = 0; j < N; j++) {
-            std::cout << matrix[i][j] << " ";
-        }
-        std::cout << "\n";
-    }
-    std::cout << "---------------------------\n";
     std::cout << "Matrix after DCT (Column transformation -> Row transformation):\n";
     for(int i = 0; i < N; i++) {
         for(int j = 0; j < N; j++) {
@@ -192,13 +208,18 @@ void dct(std::string fileName) {
         std::cout << "\n";
     }
     std::cout << "---------------------------\n";
-   
+    std::cout << "############################\n";
 }
 
 
 int main(int argc, char * argv[]) {
-   //arithmeticCoding(argv[1]);
-   dct(argv[1]);
+    if(argc != 3) {
+        std::cout << "usage: ./test {Arithmetic Encoding Input Text File} {Discrete Cosine Transformation Input Text File}\n";
+        return 1;
+    }
+   arithmeticCoding(argv[1]);
+   dct(argv[2]);
+   return 0;
     //std::cout << dctTransform(2, 2, 4);
     //For testing multiplication
 

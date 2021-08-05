@@ -2,7 +2,7 @@
 #define WAVCOMPRESSION_H
 
 #include "wavfile.h"
-
+#include "lzwmap.h"
 // Look at https://monkeysaudio.com/theory.html for more information
 class wavCompression
 {

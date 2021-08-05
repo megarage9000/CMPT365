@@ -32,6 +32,12 @@ wavCompression::wavCompression(QString fileName)
 void wavCompression::compress() {
     getMidSideChannels();
     linearPredict();
+    std::cout << "Running LZWMAP\n";
+    LZWMap midXCode = LZWMap(midXPredict);
+    if(isStereo){
+        LZWMap sideYCode = LZWMap(sideYPredict);
+    }
+
 }
 
 void wavCompression::getMidSideChannels(){
@@ -59,13 +65,12 @@ void wavCompression::getMidSideChannels(){
     P3 = (3 * X-1) - (3 *X-2) + X-3
  */
 void wavCompression::linearPredict(){
-    int order = 3;
     int numSamples = fileToRead.getDataSizeInSamples();
     if(isStereo) {
         midXPredict = QVector<double>(numSamples);
         sideYPredict = QVector<double>(numSamples);
 
-        for(int i = 0; i < numSamples; i+= order) {
+        for(int i = 0; i < numSamples; i++) {
             switch(i) {
                 case 0:
                     midXPredict[i] = midX[i] - 0;
@@ -84,12 +89,13 @@ void wavCompression::linearPredict(){
                     sideYPredict[i] = sideY[i] - (3 * sideY[i - 1] - 3 * sideY[i - 2] + sideY[i - 3]);
                     break;
             }
-            std::cout << "midXPredict, sideYPredict at " << i << ": " << midXPredict[i] << ", " << sideYPredict[i] << "\n";
+//            std::cout << "mid, side at " << i << ": " << midX[i] << ", " << sideY[i] << "\n";
+//            std::cout << "midXPredict, sideYPredict at " << i << ": " << midXPredict[i] << ", " << sideYPredict[i] << "\n";
         }
     }
     else{
         midXPredict = QVector<double>(numSamples);
-        for(int i = 0; i < numSamples; i+= order) {
+        for(int i = 0; i < numSamples; i++) {
             switch(i) {
                 case 0:
                     midXPredict[i] = midX[i] - 0;
@@ -104,7 +110,7 @@ void wavCompression::linearPredict(){
                     midXPredict[i] = midX[i] - (3 * midX[i - 1] - 3 * midX[i - 2] + midX[i - 3]);
                     break;
             }
-            std::cout << "midXPredict at " << i << ": " << midXPredict[i] << "\n";
+//            std::cout << "midXPredict at " << i << ": " << midXPredict[i] << "\n";
         }
     }
 }

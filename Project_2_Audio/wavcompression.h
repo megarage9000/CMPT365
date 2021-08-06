@@ -17,6 +17,7 @@ private:
     void getMidSideChannels();
     void linearPredict(int order);
     int predictor(QVector<float> values, int maxOrder, int index);
+    int quantizer(int value, int range);
 
     wavfile<int> fileToRead;
     bool isStereo;

@@ -70,29 +70,37 @@ int wavCompression::predictor(QVector<float> values, int maxOrder, int index){
     return numerator / divisor;
 }
 
-/*
-    P0 = 0
-    P1 = X-1
-    P2 = (2 * X-1) - X-2
-    P3 = (3 * X-1) - (3 *X-2) + X-3
- */
+int wavCompression::quantizer(int value, int range){
+    if(value < 0) {
+        return -floor(value / range + 0.5);
+    }
+    else {
+        return floor(value / range + 0.5);
+    }
+
+}
+
 // NEEED TO REVISIT: LOOK AT CHAPTER 13 / 6 OF YOUR TEXTBOOK
 void wavCompression::linearPredict(int order){
 
     int numSamples = fileToRead.getDataSizeInSamples();
+    int range = fileToRead.getHighestAmplitude() - fileToRead.getLowestAmplitude();
     if(isStereo) {
         midXPredict = QVector<int>(numSamples);
         sideYPredict = QVector<int>(numSamples);
 
        for(int i = 0; i < numSamples; i++) {
-            midXPredict[i] = predictor(midX, order, i);
-            sideYPredict[i] = predictor(sideY, order, i);
+//            midXPredict[i] = quantizer(midX[i] - predictor(midX, order, i), range);
+//            sideYPredict[i] = quantizer(sideY[i] - predictor(sideY, order, i), range);
+           midXPredict[i] = midX[i] - predictor(midX, order, i);
+           sideYPredict[i] = sideY[i] - predictor(sideY, order, i);
        }
     }
     else{
         midXPredict = QVector<int>(numSamples);
         for(int i = 0; i < numSamples; i++) {
-            midXPredict[i] = predictor(midX, order, i);
+//            midXPredict[i] = quantizer(midX[i] - predictor(midX, order, i), range);
+            midXPredict[i] = midX[i] - predictor(midX, order, i);
         }
     }
 }

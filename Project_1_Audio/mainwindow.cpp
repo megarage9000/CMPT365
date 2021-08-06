@@ -7,7 +7,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    file =  new wavfile();
+    file =  new wavfile<double>();
     plot = ui->widget;
     plot2 = ui->widget_2;
 

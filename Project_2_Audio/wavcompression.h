@@ -2,7 +2,9 @@
 #define WAVCOMPRESSION_H
 
 #include "wavfile.h"
+#include "wavfile.cpp"
 #include "lzwmap.h"
+
 // Look at https://monkeysaudio.com/theory.html for more information
 class wavCompression
 {
@@ -15,14 +17,14 @@ private:
     void getMidSideChannels();
     void linearPredict();
 
-    wavfile fileToRead;
+    wavfile<int> fileToRead;
     bool isStereo;
-    QVector<double> midX;
-    QVector<double> sideY;
+    QVector<float> midX;
+    QVector<float> sideY;
 
 
-    QVector<double> midXPredict;
-    QVector<double> sideYPredict;
+    QVector<float> midXPredict;
+    QVector<float> sideYPredict;
 
 };
 

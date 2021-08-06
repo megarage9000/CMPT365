@@ -3,7 +3,7 @@
 
 // Returns a code given a vector, else it updates the map with a new value
 // - if it doesn't find a value, returns -1
-int LZWMap::getCodeFromMap(std::vector<double> key, int * code) {
+int LZWMap::getCodeFromMap(std::vector<float> key, int * code) {
     auto element = dictionary.find(key);
     if(element != dictionary.end()) {
         return element->second;
@@ -15,24 +15,24 @@ int LZWMap::getCodeFromMap(std::vector<double> key, int * code) {
     }
 }
 
-void LZWMap::addToMap(std::vector<double> key, int value){
-    dictionary.insert(std::pair<std::vector<double>, int> (key, value) );
+void LZWMap::addToMap(std::vector<float> key, int value){
+    dictionary.insert(std::pair<std::vector<float>, int> (key, value) );
 }
 
-LZWMap::LZWMap(QVector<double> sequence)
+LZWMap::LZWMap(QVector<float> sequence)
 {
     int numElements = sequence.size();
     newCode = std::vector<int>();
 
     // initialize dictionary with 3 values of sequences
-    addToMap(std::vector<double>{sequence[0]}, 0);
-    addToMap(std::vector<double>{sequence[1]}, 1);
-    addToMap(std::vector<double>{sequence[2]}, 2);
+    addToMap(std::vector<float>{sequence[0]}, 0);
+    addToMap(std::vector<float>{sequence[1]}, 1);
+    addToMap(std::vector<float>{sequence[2]}, 2);
     int code = 3;
 
-    std::vector<double> sequenceToBeRead = std::vector<double>{sequence[0]};
+    std::vector<float> sequenceToBeRead = std::vector<float>{sequence[0]};
     for(int i = 1; i < numElements; i++) {
-        std::vector<double> prevSequenceRead = std::vector<double>(sequenceToBeRead);
+        std::vector<float> prevSequenceRead = std::vector<float>(sequenceToBeRead);
         sequenceToBeRead.push_back(sequence[i]);
         if(getCodeFromMap(sequenceToBeRead, &code) == -1) {
             while(getCodeFromMap(prevSequenceRead, &code) == -1);

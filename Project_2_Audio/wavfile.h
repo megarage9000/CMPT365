@@ -2,10 +2,11 @@
 #define WAVFILE_H
 
 #include <QFile>
-#include <QtEndian>
 #include <iostream>
 #include <tgmath.h>
+#include "fromLittleEndian.h"
 
+template<typename S>
 class wavfile
 {
 public:
@@ -13,16 +14,16 @@ public:
     void readWavFile(QString fileName);
     void modifyData(float startingPercent, float endPercent, int startIndex, int endIndex, QVector<double> * dest);
     void modifyDataStereo(float startingPercent, float endPercent, int startIndex, int endIndex, QVector<double> * dest, QVector<double> * dest2);
-    QVector<double> getSamples();
-    QVector<double> getAmplitudes();
-    QVector<double> getAmplitudes2();
+    QVector<S> getSamples();
+    QVector<S> getAmplitudes();
+    QVector<S> getAmplitudes2();
     int getDataSizeInSamples();
     int getLowestAmplitude();
     int getHighestAmplitude();
     int getSamplesPerSecond();
     bool isStereo();
-    template<class T>
     void readSamples(QFile * wavFile, int numBytesToRead);
+
 
 private:
     int numChannels;
@@ -36,12 +37,14 @@ private:
     // Not to be confused with the actual data,
     // samples just indicate the index of the given
     // amplitude. QCustomPlot needs it
-    QVector<double> samples;
+    QVector<S> samples;
     // The actual sample data
-    QVector<double> amplitudes;
+    QVector<S> amplitudes;
     // If it is stereo
-    QVector<double> amplitudes2;
+    QVector<S> amplitudes2;
 
 };
+
+
 
 #endif // WAVFILE_H

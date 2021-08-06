@@ -1,19 +1,11 @@
 #include "wavfile.h"
-
-wavfile::wavfile()
+template<typename S>
+wavfile<S>::wavfile()
 {
 }
 
-template<class convertedType>
-convertedType fromLittleEndian(QFile * file, int numBytes) {
-    char * bits = new char[numBytes];
-    file->read(bits, numBytes);
-    convertedType result = qFromLittleEndian<convertedType>((uchar*)bits);
-    delete[] bits;
-    return result;
-}
-
-void wavfile::readWavFile(QString fileName) {
+template<typename S>
+void wavfile<S>::readWavFile(QString fileName) {
     QFile wavFile(fileName);
     if(!wavFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
         return;
@@ -54,28 +46,34 @@ void wavfile::readWavFile(QString fileName) {
     dataSizeInSamples = dataSize / numBytesToRead;
     lowestAmplitude = 0;
     highestAmplitude = 0;
-
-    // For 2 byte reads
-    if(numBytesToRead == 2) {
-        readSamples<qint16_le>(&wavFile, numBytesToRead);
-    }
-    // For 4 byte reads
-    else if(numBytesToRead == 4){
-        readSamples<qint32_le>(&wavFile, numBytesToRead);
-    }
+    readSamples(&wavFile, numBytesToRead);
+    std::cout << "num bytes = " << numBytesToRead << std::endl;
     wavFile.close();
 }
-template<class T>
-void wavfile::readSamples(QFile * wavFile, int numBytesToRead){
+
+template<typename S>
+void wavfile<S>::readSamples(QFile * wavFile, int numBytesToRead){
     // For Stereo reads
     if(isStereo()) {
         dataSizeInSamples = dataSizeInSamples / 2;
-        samples = QVector<double>(dataSizeInSamples);
-        amplitudes = QVector<double>(dataSizeInSamples);
-        amplitudes2 = QVector<double>(dataSizeInSamples);
+        samples = QVector<S>(dataSizeInSamples);
+        amplitudes = QVector<S>(dataSizeInSamples);
+        amplitudes2 = QVector<S>(dataSizeInSamples);
         for(int i = 0; i < dataSizeInSamples ; i++) {
-            amplitudes[i] = fromLittleEndian<T>(wavFile, numBytesToRead);
-            amplitudes2[i] = fromLittleEndian<T>(wavFile, numBytesToRead);
+
+            if(numBytesToRead == 1) {
+                amplitudes[i] = fromLittleEndian<qint8>(wavFile, numBytesToRead);
+                amplitudes2[i] = fromLittleEndian<qint8>(wavFile, numBytesToRead);
+            }
+            else if(numBytesToRead == 2) {
+                amplitudes[i] = fromLittleEndian<qint16_le>(wavFile, numBytesToRead);
+                amplitudes2[i] = fromLittleEndian<qint16_le>(wavFile, numBytesToRead);
+            }
+            else{
+                amplitudes[i] = fromLittleEndian<qint32_le>(wavFile, numBytesToRead);
+                amplitudes2[i] = fromLittleEndian<qint32_le>(wavFile, numBytesToRead);
+            }
+
             samples[i] = i;
             if(amplitudes[i] > highestAmplitude) {
                 highestAmplitude = amplitudes[i];
@@ -83,14 +81,25 @@ void wavfile::readSamples(QFile * wavFile, int numBytesToRead){
             if(amplitudes[i] < lowestAmplitude) {
                 lowestAmplitude = amplitudes[i];
             }
+            std::cout << "Amplitudes 1, 2 = " << amplitudes[i] << ", " << amplitudes2[i] << "\n";
         }
     }
     // For Mono reads
     else {
-        samples = QVector<double>(dataSizeInSamples);
-        amplitudes = QVector<double>(dataSizeInSamples);
+        samples = QVector<S>(dataSizeInSamples);
+        amplitudes = QVector<S>(dataSizeInSamples);
+
         for(int i = 0; i < dataSizeInSamples ; i++) {
-            amplitudes[i] = fromLittleEndian<T>(wavFile, numBytesToRead);
+            if(numBytesToRead == 1) {
+                amplitudes[i] = fromLittleEndian<qint8>(wavFile, numBytesToRead);
+            }
+            else if(numBytesToRead == 2) {
+                amplitudes[i] = fromLittleEndian<qint16_le>(wavFile, numBytesToRead);
+            }
+            else{
+                amplitudes[i] = fromLittleEndian<qint32_le>(wavFile, numBytesToRead);
+            }
+
             samples[i] = i;
             if(amplitudes[i] > highestAmplitude) {
                 highestAmplitude = amplitudes[i];
@@ -98,12 +107,15 @@ void wavfile::readSamples(QFile * wavFile, int numBytesToRead){
             if(amplitudes[i] < lowestAmplitude) {
                 lowestAmplitude = amplitudes[i];
             }
+            std::cout << "Amplitudes 1 = " << amplitudes[i] << "\n";
         }
     }
 }
 
 
-void wavfile::modifyData(float startingPercent, float endPercent, int startIndex, int endIndex, QVector<double> * dest){
+
+template <typename S>
+void wavfile<S>::modifyData(float startingPercent, float endPercent, int startIndex, int endIndex, QVector<double> * dest){
     // We will increase the starting percent to end percent linearly
     // for dB values, as it logarithmically modifies the amplitude
     int numSamples = endIndex - startIndex;
@@ -115,7 +127,9 @@ void wavfile::modifyData(float startingPercent, float endPercent, int startIndex
         currentRate += rate;
     }
 }
-void wavfile::modifyDataStereo(float startingPercent, float endPercent, int startIndex, int endIndex, QVector<double> * dest, QVector<double> * dest2){
+
+template<typename S>
+void wavfile<S>::modifyDataStereo(float startingPercent, float endPercent, int startIndex, int endIndex, QVector<double> * dest, QVector<double> * dest2){
     int numSamples = endIndex - startIndex;
     double rate = (double)(endPercent - startingPercent) / numSamples;
     double currentRate = startingPercent + rate;
@@ -127,36 +141,45 @@ void wavfile::modifyDataStereo(float startingPercent, float endPercent, int star
     }
 }
 
-
-QVector<double> wavfile::getSamples() {
+template<typename S>
+QVector<S> wavfile<S>::getSamples() {
     return samples;
 }
 
-QVector<double> wavfile::getAmplitudes() {
+template<typename S>
+QVector<S> wavfile<S>::getAmplitudes() {
     return amplitudes;
 }
 
-QVector<double> wavfile::getAmplitudes2() {
+template<typename S>
+QVector<S> wavfile<S>::getAmplitudes2() {
     return amplitudes2;
 }
 
-int wavfile::getDataSizeInSamples(){
+template<typename S>
+int wavfile<S>::getDataSizeInSamples(){
     return dataSizeInSamples;
 }
 
-int wavfile::getHighestAmplitude(){
+template<typename S>
+int wavfile<S>::getHighestAmplitude(){
     return highestAmplitude;
 }
 
-int wavfile::getLowestAmplitude(){
+template<typename S>
+int wavfile<S>::getLowestAmplitude(){
     return lowestAmplitude;
 }
 
-int wavfile::getSamplesPerSecond() {
+template<typename S>
+int wavfile<S>::getSamplesPerSecond() {
     return sampleRate;
 }
 
-bool wavfile::isStereo() {
+template<typename S>
+bool wavfile<S>::isStereo() {
     return (numChannels == 2);
 }
 
+template class wavfile<int>;
+template class wavfile<double>;

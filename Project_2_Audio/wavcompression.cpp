@@ -8,11 +8,17 @@ wavCompression::wavCompression()
 
 wavCompression::wavCompression(QString fileName)
 {
-    fileToRead = wavfile();
+    fileToRead = wavfile<int>();
     fileToRead.readWavFile(fileName);
-    int numSamples = fileToRead.getDataSizeInSamples();
-    QVector<double> samples = fileToRead.getAmplitudes();
+
     isStereo = fileToRead.isStereo();
+    if(!isStereo){
+        int numSamples = fileToRead.getDataSizeInSamples();
+        QVector<int> samples = fileToRead.getAmplitudes();
+        for(int i = 0; i < numSamples; i++) {
+            midX[i] = samples[i];
+        }
+    }
     compress();
 }
 
@@ -31,10 +37,10 @@ void wavCompression::compress() {
 void wavCompression::getMidSideChannels(){
     if(isStereo) {
         int numSamples = fileToRead.getDataSizeInSamples();
-        midX = QVector<double>(numSamples);
-        sideY = QVector<double>(numSamples);
-        QVector<double> samplesLeft = fileToRead.getAmplitudes();
-        QVector<double> samplesRight = fileToRead.getAmplitudes2();
+        midX = QVector<float>(numSamples);
+        sideY = QVector<float>(numSamples);
+        QVector<int> samplesLeft = fileToRead.getAmplitudes();
+        QVector<int> samplesRight = fileToRead.getAmplitudes2();
         for(int i = 0; i < numSamples; i++) {
             midX[i] = (samplesLeft[i] + samplesRight[i]) / 2.0f;
             sideY[i] = (samplesLeft[i] - samplesRight[i]) / 2.0f;
@@ -55,8 +61,8 @@ void wavCompression::getMidSideChannels(){
 void wavCompression::linearPredict(){
     int numSamples = fileToRead.getDataSizeInSamples();
     if(isStereo) {
-        midXPredict = QVector<double>(numSamples);
-        sideYPredict = QVector<double>(numSamples);
+        midXPredict = QVector<float>(numSamples);
+        sideYPredict = QVector<float>(numSamples);
 
         for(int i = 0; i < numSamples; i++) {
             switch(i) {
@@ -82,7 +88,7 @@ void wavCompression::linearPredict(){
         }
     }
     else{
-        midXPredict = QVector<double>(numSamples);
+        midXPredict = QVector<float>(numSamples);
         for(int i = 0; i < numSamples; i++) {
             switch(i) {
                 case 0:
@@ -102,6 +108,7 @@ void wavCompression::linearPredict(){
         }
     }
 }
+
 
 
 

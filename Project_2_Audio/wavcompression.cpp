@@ -13,19 +13,6 @@ wavCompression::wavCompression(QString fileName)
     int numSamples = fileToRead.getDataSizeInSamples();
     QVector<double> samples = fileToRead.getAmplitudes();
     isStereo = fileToRead.isStereo();
-//    if(isStereo) {
-//        QVector<double> samples2 = fileToRead.getAmplitudes2();
-//        for(int i = 0; i < numSamples; i++) {
-//            std::cout <<  i << ": " << samples[i];
-//            std::cout << ", " << samples2[i] << "\n";
-//        }
-//    }
-//    else{
-//        for(int i = 0; i < numSamples; i++) {
-//            std::cout <<  i << ": " << samples[i] << "\n";
-//        }
-//    }
-
     compress();
 }
 
@@ -35,6 +22,7 @@ void wavCompression::compress() {
     std::cout << "Running LZWMAP\n";
     LZWMap midXCode = LZWMap(midXPredict);
     if(isStereo){
+        std::cout << "Running LZWMAP side\n";
         LZWMap sideYCode = LZWMap(sideYPredict);
     }
 

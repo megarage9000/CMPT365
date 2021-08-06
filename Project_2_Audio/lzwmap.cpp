@@ -1,35 +1,49 @@
 #include "lzwmap.h"
 
 
+// Returns a code given a vector, else it updates the map with a new value
+// - if it doesn't find a value, returns -1
+int LZWMap::getCodeFromMap(std::vector<double> key, int * code) {
+    auto element = dictionary.find(key);
+    if(element != dictionary.end()) {
+        return element->second;
+    }
+    else{
+        addToMap(key, *code);
+        (*code)++;
+        return -1;
+    }
+}
+
+void LZWMap::addToMap(std::vector<double> key, int value){
+    dictionary.insert(std::pair<std::vector<double>, int> (key, value) );
+}
+
 LZWMap::LZWMap(QVector<double> sequence)
 {
     int numElements = sequence.size();
     newCode = std::vector<int>();
 
     // initialize dictionary with 3 values of sequences
-    dictionary[std::vector<double> {sequence[0]}] = 0;
-    dictionary[std::vector<double> {sequence[1]}] = 1;
-    dictionary[std::vector<double> {sequence[2]}] = 2;
+    addToMap(std::vector<double>{sequence[0]}, 0);
+    addToMap(std::vector<double>{sequence[1]}, 1);
+    addToMap(std::vector<double>{sequence[2]}, 2);
     int code = 3;
 
-    std::vector<double> sequenceToBeRead = std::vector<double>{sequence[2]};
-
-    for(int i = 3; i < numElements; i++) {
+    std::vector<double> sequenceToBeRead = std::vector<double>{sequence[0]};
+    for(int i = 1; i < numElements; i++) {
+        std::vector<double> prevSequenceRead = std::vector<double>(sequenceToBeRead);
         sequenceToBeRead.push_back(sequence[i]);
-        // If sequence is not found
-        if(dictionary.find(sequenceToBeRead) == dictionary.end()) {
-            newCode.push_back(
-                        dictionary.find(std::vector<double>(sequenceToBeRead.begin(), sequenceToBeRead.end()- 1))->second
-                        );
-
-            dictionary[sequenceToBeRead] = code;
+        if(getCodeFromMap(sequenceToBeRead, &code) == -1) {
+            while(getCodeFromMap(prevSequenceRead, &code) == -1);
+            int codeToAdd = dictionary.at(prevSequenceRead);
+            newCode.push_back(codeToAdd);
             sequenceToBeRead.clear();
             sequenceToBeRead.push_back(sequence[i]);
-            code++;
         }
     }
     newCode.push_back(
-            dictionary.find(std::vector<double>(sequenceToBeRead.begin(), sequenceToBeRead.end()))->second
+           getCodeFromMap(sequenceToBeRead, &code)
     );
 
     newCode.shrink_to_fit();
@@ -40,5 +54,6 @@ LZWMap::LZWMap(QVector<double> sequence)
 //    std::cout << "\n";
     sequence.shrink_to_fit();
 
-    std::cout << "Original sequence size = " << (int)sequence.size() * sizeof(double) << ", Coded sequence size = " << (int)newCode.size() * sizeof(int) << "\n";
+    std::cout << "Original sequence size = " << (int)sequence.size() << ", Coded sequence size = " << (int)newCode.size()<< "\n";
 }
+

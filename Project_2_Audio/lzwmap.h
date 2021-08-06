@@ -7,13 +7,13 @@
 class LZWMap
 {
 public:
-    LZWMap(QVector<float> sequence);
+    LZWMap(QVector<int> sequence);
     int getSizeInBytes();
-    std::map<std::vector<float>, int> dictionary;
+    std::map<std::vector<int>, int> dictionary;
     std::vector<int> newCode;
 private:
-    int getCodeFromMap(std::vector<float> key, int * code);
-    void addToMap(std::vector<float> key, int value);
+    int getCodeFromMap(std::vector<int> key, int * code);
+    void addToMap(std::vector<int> key, int value);
 };
 
 #endif // LZWMAP_H

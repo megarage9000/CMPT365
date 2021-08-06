@@ -47,7 +47,6 @@ void wavfile<S>::readWavFile(QString fileName) {
     lowestAmplitude = 0;
     highestAmplitude = 0;
     readSamples(&wavFile, numBytesToRead);
-    std::cout << "num bytes = " << numBytesToRead << std::endl;
     wavFile.close();
 }
 
@@ -81,7 +80,12 @@ void wavfile<S>::readSamples(QFile * wavFile, int numBytesToRead){
             if(amplitudes[i] < lowestAmplitude) {
                 lowestAmplitude = amplitudes[i];
             }
-            std::cout << "Amplitudes 1, 2 = " << amplitudes[i] << ", " << amplitudes2[i] << "\n";
+            if(amplitudes2[i] > highestAmplitude) {
+                highestAmplitude = amplitudes2[i];
+            }
+            if(amplitudes2[i] < lowestAmplitude) {
+                lowestAmplitude = amplitudes2[i];
+            }
         }
     }
     // For Mono reads
@@ -107,7 +111,6 @@ void wavfile<S>::readSamples(QFile * wavFile, int numBytesToRead){
             if(amplitudes[i] < lowestAmplitude) {
                 lowestAmplitude = amplitudes[i];
             }
-            std::cout << "Amplitudes 1 = " << amplitudes[i] << "\n";
         }
     }
 }

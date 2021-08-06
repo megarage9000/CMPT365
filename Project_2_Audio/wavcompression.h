@@ -15,7 +15,8 @@ public:
 private:
     void compress();
     void getMidSideChannels();
-    void linearPredict();
+    void linearPredict(int order);
+    int predictor(QVector<float> values, int maxOrder, int index);
 
     wavfile<int> fileToRead;
     bool isStereo;
@@ -23,8 +24,8 @@ private:
     QVector<float> sideY;
 
 
-    QVector<float> midXPredict;
-    QVector<float> sideYPredict;
+    QVector<int> midXPredict;
+    QVector<int> sideYPredict;
 
 };
 

@@ -24,7 +24,7 @@ wavCompression::wavCompression(QString fileName)
 
 void wavCompression::compress() {
     getMidSideChannels();
-    linearPredict();
+    linearPredict(10);
     std::cout << "Running LZWMAP\n";
     LZWMap midXCode = LZWMap(midXPredict);
     if(isStereo){
@@ -52,59 +52,47 @@ void wavCompression::getMidSideChannels(){
     }
 }
 
+int wavCompression::predictor(QVector<float> values, int maxOrder, int index){
+    if(index == 0) {
+        return values[0];
+    }
+    int numerator = 0;
+    int divisor = 0;
+    int start = index - (maxOrder - 1);
+    if(start < 0) {
+        start = 0;
+    }
+
+    for(int i = start; i < index; i++) {
+        numerator += values[i];
+        divisor++;
+    }
+    return numerator / divisor;
+}
+
 /*
     P0 = 0
     P1 = X-1
     P2 = (2 * X-1) - X-2
     P3 = (3 * X-1) - (3 *X-2) + X-3
  */
-void wavCompression::linearPredict(){
+// NEEED TO REVISIT: LOOK AT CHAPTER 13 / 6 OF YOUR TEXTBOOK
+void wavCompression::linearPredict(int order){
+
     int numSamples = fileToRead.getDataSizeInSamples();
     if(isStereo) {
-        midXPredict = QVector<float>(numSamples);
-        sideYPredict = QVector<float>(numSamples);
+        midXPredict = QVector<int>(numSamples);
+        sideYPredict = QVector<int>(numSamples);
 
-        for(int i = 0; i < numSamples; i++) {
-            switch(i) {
-                case 0:
-                    midXPredict[i] = midX[i] - 0;
-                    sideYPredict[i] = sideY[i] - 0;
-                    break;
-                case 1:
-                    midXPredict[i] = midX[i] - (midX[i - 1]);
-                    sideYPredict[i] = sideY[i] - (sideY[i - 1]);
-                    break;
-                case 2:
-                    midXPredict[i] = midX[i] - (2 * midX[i - 1] - midX[i - 2]);
-                    sideYPredict[i] = sideY[i] - (2 * sideY[i - 1] - sideY[i - 2]);
-                    break;
-                default:
-                    midXPredict[i] = midX[i] - (3 * midX[i - 1] - 3 * midX[i - 2] + midX[i - 3]);
-                    sideYPredict[i] = sideY[i] - (3 * sideY[i - 1] - 3 * sideY[i - 2] + sideY[i - 3]);
-                    break;
-            }
-//            std::cout << "mid, side at " << i << ": " << midX[i] << ", " << sideY[i] << "\n";
-//            std::cout << "midXPredict, sideYPredict at " << i << ": " << midXPredict[i] << ", " << sideYPredict[i] << "\n";
-        }
+       for(int i = 0; i < numSamples; i++) {
+            midXPredict[i] = predictor(midX, order, i);
+            sideYPredict[i] = predictor(sideY, order, i);
+       }
     }
     else{
-        midXPredict = QVector<float>(numSamples);
+        midXPredict = QVector<int>(numSamples);
         for(int i = 0; i < numSamples; i++) {
-            switch(i) {
-                case 0:
-                    midXPredict[i] = midX[i] - 0;
-                    break;
-                case 1:
-                    midXPredict[i] = midX[i] - (midX[i - 1]);
-                    break;
-                case 2:
-                    midXPredict[i] = midX[i] - (2 * midX[i - 1] - midX[i - 2]);
-                    break;
-                default:
-                    midXPredict[i] = midX[i] - (3 * midX[i - 1] - 3 * midX[i - 2] + midX[i - 3]);
-                    break;
-            }
-//            std::cout << "midXPredict at " << i << ": " << midXPredict[i] << "\n";
+            midXPredict[i] = predictor(midX, order, i);
         }
     }
 }

@@ -1,11 +1,6 @@
 #include "wavcompression.h"
 
 
-wavCompression::wavCompression()
-{
-
-}
-
 wavCompression::wavCompression(QString fileName)
 {
     fileToRead = wavfile<int>();
@@ -14,11 +9,13 @@ wavCompression::wavCompression(QString fileName)
     isStereo = fileToRead.isStereo();
     if(!isStereo){
         int numSamples = fileToRead.getDataSizeInSamples();
+        midX = QVector<float>(numSamples);
         QVector<int> samples = fileToRead.getAmplitudes();
         for(int i = 0; i < numSamples; i++) {
             midX[i] = samples[i];
         }
     }
+
     compress();
 }
 
@@ -26,12 +23,39 @@ void wavCompression::compress() {
     getMidSideChannels();
     linearPredict(10);
     std::cout << "Running LZWMAP\n";
-    LZWMap midXCode = LZWMap(midXPredict);
+    midXCode = LZWMap(midXPredict);
+    midXCode.writeToFile("midXCode.txt");
+    writeSamplesToFile("samples.txt");
+
+    QFile midXFile("midXCode.txt");
+    QFile samplesFile("samples.txt");
+
     if(isStereo){
         std::cout << "Running LZWMAP side\n";
-        LZWMap sideYCode = LZWMap(sideYPredict);
-    }
+        sideYCode = LZWMap(sideYPredict);
+        sideYCode.writeToFile("sideYCode.txt");
 
+        QFile sideYFile("sideYCode.txt");
+
+        int sizeOfCode = sideYFile.size() + midXFile.size();
+        int sizeOfSamples = samplesFile.size();
+
+        std::cout << "Samples size in bytes = " << sizeOfSamples
+                  << ", size of coded sequence = " << sizeOfCode
+                  << ", Compression Ratio = " << (float)sizeOfSamples / sizeOfCode
+                  << "\n";
+
+    }
+    else {
+        int sizeOfCode = midXFile.size();
+        int sizeOfSamples = samplesFile.size();
+
+        std::cout << "Samples size in bytes = " << sizeOfSamples
+                  << ", size of coded sequence = " << sizeOfCode
+                  << ", Compression Ratio = " << (float)sizeOfSamples / sizeOfCode
+                  << "\n";
+
+    }
 }
 
 void wavCompression::getMidSideChannels(){
@@ -70,15 +94,7 @@ int wavCompression::predictor(QVector<float> values, int maxOrder, int index){
     return numerator / divisor;
 }
 
-int wavCompression::quantizer(int value, int range){
-    if(value < 0) {
-        return -floor(value / range + 0.5);
-    }
-    else {
-        return floor(value / range + 0.5);
-    }
 
-}
 
 // NEEED TO REVISIT: LOOK AT CHAPTER 13 / 6 OF YOUR TEXTBOOK
 void wavCompression::linearPredict(int order){
@@ -102,6 +118,32 @@ void wavCompression::linearPredict(int order){
 //            midXPredict[i] = quantizer(midX[i] - predictor(midX, order, i), range);
             midXPredict[i] = midX[i] - predictor(midX, order, i);
         }
+    }
+}
+
+void wavCompression::writeSamplesToFile(QString fileName) {
+    QFile file(fileName);
+
+    if(file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QTextStream out(&file);
+
+        QVector<int> samples = fileToRead.getAmplitudes();
+        int length = samples.size();
+        for(int i = 0; i < length; i++) {
+            out << samples[i];
+        }
+        if(isStereo) {
+            QVector<int> samplesRight = fileToRead.getAmplitudes2();
+            int lengthRight = samplesRight.size();
+            for(int i = 0; i < lengthRight; i++) {
+                out << samplesRight[i];
+            }
+        }
+
+        file.close();
+    }
+    else {
+        return;
     }
 }
 

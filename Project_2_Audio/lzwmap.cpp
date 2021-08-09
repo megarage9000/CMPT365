@@ -19,6 +19,10 @@ void LZWMap::addToMap(std::vector<int> key, int value){
     dictionary.insert(std::pair<std::vector<int>, int> (key, value) );
 }
 
+LZWMap::LZWMap() {
+
+}
+
 LZWMap::LZWMap(QVector<int> sequence)
 {
     int numElements = sequence.size();
@@ -47,27 +51,34 @@ LZWMap::LZWMap(QVector<int> sequence)
     );
 
     newCode.shrink_to_fit();
-//    int newCodeSize = newCode.size();
-//    for(int i = 0; i < newCodeSize; i++) {
-//        std::cout << newCode[i];
-//    }
-//    std::cout << "\n";
-    sequence.shrink_to_fit();
-
-    std::cout << "Original sequence size = " << (int)sequence.size() << ", Coded sequence size = " << (int)newCode.size() << "\n";
-
-    std::cout << "Original sequence: \n";
-    int seqSize = (int)sequence.size();
-    for(int i = 0; i < seqSize; i++) {
-        std::cout << sequence[i] << " ";
-    }
-    std::cout << "\n";
-
-    std::cout << "New sequence: \n";
-    int newCodeSize = (int)newCode.size();
-    for(int i = 0; i < newCodeSize; i++) {
-        std::cout << newCode[i] << " ";
-    }
-    std::cout << "\n";
 }
 
+void LZWMap::writeToFile(QString filename) {
+    QFile file(filename);
+
+    if(file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QTextStream out(&file);
+
+//        // Write dictionary pairs
+//        for (auto const &entry: dictionary) {
+//            std::vector<int> sequence = entry.first;
+//            int code = entry.second;
+
+//            for(int num: sequence) {
+//                out << num;
+//            }
+//            out << code;
+//        }
+
+        // Write code
+        int newCodeSize = newCode.size();
+        for(int i = 0; i < newCodeSize; i++) {
+            out << newCode[i];
+        }
+
+        file.close();
+    }
+    else {
+        return;
+    }
+}

@@ -9,24 +9,27 @@
 class wavCompression
 {
 public:
-    wavCompression();
     wavCompression(QString fileName);
+    void writeSamplesToFile(QString fileName);
+
+    LZWMap midXCode;
+    LZWMap sideYCode;
 
 private:
     void compress();
     void getMidSideChannels();
     void linearPredict(int order);
     int predictor(QVector<float> values, int maxOrder, int index);
-    int quantizer(int value, int range);
 
     wavfile<int> fileToRead;
     bool isStereo;
     QVector<float> midX;
     QVector<float> sideY;
 
-
     QVector<int> midXPredict;
     QVector<int> sideYPredict;
+
+
 
 };
 

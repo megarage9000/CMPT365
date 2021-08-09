@@ -9,6 +9,10 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    abac-master/bitstream.cpp \
+    abac-master/cabac.cpp \
+    abac-master/memory.cpp \
+    abac-master/test.cpp \
     lzwmap.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -17,6 +21,12 @@ SOURCES += \
     wavfile.cpp
 
 HEADERS += \
+    abac-master/base.h \
+    abac-master/bitstream.h \
+    abac-master/cabac.h \
+    abac-master/math.h \
+    abac-master/memory.h \
+    abac-master/version.h \
     fromLittleEndian.h \
     lzwmap.h \
     mainwindow.h \
@@ -31,3 +41,9 @@ FORMS += \
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+DISTFILES += \
+    abac-master/LICENSE \
+    abac-master/Makefile \
+    abac-master/README.md \
+    abac-master/abac-test

@@ -12,7 +12,6 @@ SOURCES += \
     abac-master/bitstream.cpp \
     abac-master/cabac.cpp \
     abac-master/memory.cpp \
-    abac-master/test.cpp \
     lzwmap.cpp \
     main.cpp \
     mainwindow.cpp \

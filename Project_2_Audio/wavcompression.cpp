@@ -22,18 +22,27 @@ wavCompression::wavCompression(QString fileName)
 void wavCompression::compress() {
     getMidSideChannels();
     linearPredict(10);
-    std::cout << "Running LZWMAP\n";
-    midXCode = LZWMap(midXPredict);
-    midXCode.writeToFile("midXCode.txt");
-    writeSamplesToFile("samples.txt");
+//    midXCode = LZWMap(midXPredict);
+//    midXCode.writeToFile("midXCode.txt");
+    evx::entropy_coder coder;
+    evx::bitstream midXStream(midXPredict.data(), midXPredict.size());
+    evx::bitstream midXStreamCode(midXPredict.size());
+    coder.encode(&midXStream, &midXStreamCode);
 
     QFile midXFile("midXCode.txt");
+
+    if(midXFile.open(QIODevice::WriteOnly | QIODevice::Text)){
+        QTextStream out(&midXFile);
+
+        out << midXStreamCode.query_data();
+    }
+
+    writeSamplesToFile("samples.txt");
     QFile samplesFile("samples.txt");
 
     if(isStereo){
-        std::cout << "Running LZWMAP side\n";
-        sideYCode = LZWMap(sideYPredict);
-        sideYCode.writeToFile("sideYCode.txt");
+//        sideYCode = LZWMap(sideYPredict);
+//        sideYCode.writeToFile("sideYCode.txt");
 
         QFile sideYFile("sideYCode.txt");
 
@@ -56,6 +65,10 @@ void wavCompression::compress() {
                   << "\n";
 
     }
+
+    midXFile.close();
+    samplesFile.close();
+
 }
 
 void wavCompression::getMidSideChannels(){

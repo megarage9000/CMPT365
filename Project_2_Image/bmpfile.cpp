@@ -19,33 +19,43 @@ BMPFile::BMPFile(QString fileLocation)
     //calculateImages(fileLocation);
 }
 
+std::vector<std::vector<QRgb>> BMPFile::getRgbs(){
+    return values;
+}
+
+int BMPFile::getRgbWidth() {
+    return imageWidth;
+}
+int BMPFile::getRgbHeight(){
+    return imageHeight;
+}
+
 void BMPFile::getRGBData(){
-    if(values == NULL) {
-        int width = imageFile.width();
-        int height = imageFile.height();
 
-        values = new QRgb[width * height];
-        imageWidth = width;
-        imageHeight = height;
+    int width = imageFile.width();
+    int height = imageFile.height();
 
-        for(int y = 0; y < height; y++) {
-            QRgb * rgbVals = (QRgb *)imageFile.scanLine(y);
-            for(int x = 0; x < width; x++) {
-                setValueAt(y, x, rgbVals[x]);
-            }
+    values = std::vector<std::vector<QRgb>>();
+    imageWidth = width;
+    imageHeight = height;
+
+    for(int y = 0; y < height; y++) {
+        QRgb * rgbVals = (QRgb *)imageFile.scanLine(y);
+        std::vector<QRgb> newRow = std::vector<QRgb>();
+        for(int x = 0; x < width; x++) {
+            newRow.push_back(rgbVals[x]);
         }
+        values.push_back(newRow);
     }
+
 
 }
 
 
 void BMPFile::outputRgbValues(){
-    if(values == NULL) {
-        return;
-    }
     for(int y = 0; y < imageHeight; y++){
         for(int x = 0; x < imageWidth; x++) {
-            QRgb value = getValueAt(y, x);
+            QRgb value = values[y][x];
             std::cout << "Value at row " << y << ", column " << x << " = "
                 << "|Red: " << qRed(value)
                 << "|Blue: " << qBlue(value)
@@ -53,26 +63,7 @@ void BMPFile::outputRgbValues(){
         }
     }
 }
-void BMPFile::freeRgbValues(){
-    if(values == NULL){
-        return;
-    }
-    delete[] values;
-    values = NULL;
-}
 
-void BMPFile::setValueAt(int row, int col, QRgb value){
-    if(values != NULL) {
-        values[row * imageWidth + col] = value;
-    }
-}
-
-QRgb BMPFile::getValueAt(int row, int col) {
-    if(values != NULL){
-        return values[row * imageWidth + col];
-    }
-    return QRgb();
-}
 
 // --- Grayscale ---
 void BMPFile::calculateGrayScale() {

@@ -10,12 +10,18 @@ CONFIG += c++11
 
 SOURCES += \
     bmpfile.cpp \
+    imagecompressor.cpp \
+    imagedecompressor.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    ycocgconversion.cpp
 
 HEADERS += \
     bmpfile.h \
-    mainwindow.h
+    imagecompressor.h \
+    imagedecompressor.h \
+    mainwindow.h \
+    ycocgconversion.h
 
 FORMS += \
     mainwindow.ui

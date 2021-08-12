@@ -22,13 +22,15 @@ public:
     QImage getGrayScaleDither();
 
     void outputRgbValues();
-    void freeRgbValues();
+
+    std::vector<std::vector<QRgb>> getRgbs();
+    int getRgbWidth();
+    int getRgbHeight();
 
 private:
     void calculateAutoLevel();
     void calculateGrayScale();
     void calculateDither();
-
     void getRGBData();
 
     QImage imageFile;
@@ -45,11 +47,10 @@ private:
         return ditherMatrix[row][col];
     }
 
-    QRgb * values = NULL;
+    std::vector<std::vector<QRgb>> values;
     int imageWidth;
     int imageHeight;
-    QRgb getValueAt(int row, int col);
-    void setValueAt(int row, int col, QRgb value);
+
 
 };
 

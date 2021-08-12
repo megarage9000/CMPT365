@@ -10,7 +10,6 @@ int main(int argc, char *argv[])
 
     BMPFile file = BMPFile("/home/megarage9000/repos/CMPT365/Project_2_test_files/Project2/bmp-sample-3.bmp");
     file.outputRgbValues();
-    file.freeRgbValues();
     w.show();
     return a.exec();
 }

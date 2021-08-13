@@ -18,7 +18,7 @@ namespace YCoCgConversion {
         for(int row = 0; row < height; row++) {
             YRow = std::vector<int>();
 
-            // Create Co / Cg rows if row is multiple of 2
+            // Create Co / Cg rows if row is multiple of the given DOWNSAMPLE_VERT
             if(row % DOWNSAMPLE_VERT == 0) {
                 CoRow = std::vector<int>();
                 CgRow = std::vector<int>();
@@ -36,7 +36,8 @@ namespace YCoCgConversion {
 
                 YRow.push_back(YVal);
 
-                // Add values if row and col are multiples of 2
+                // Add values if row and col are multiples of the given DOWNSAMPLE_VERT
+                // and DOWNSAMPLE_HORZ respectively
                 if(row % DOWNSAMPLE_VERT == 0 && col % DOWNSAMPLE_HORZ == 0) {
                     CoRow.push_back(CoVal);
                     CgRow.push_back(CgVal);
@@ -44,6 +45,7 @@ namespace YCoCgConversion {
             }
 
             Y.push_back(YRow);
+            // add Co / Cg rows if row is multiple of the given DOWNSAMPLE_VERT
             if(row % DOWNSAMPLE_HORZ == 0) {
                 Co.push_back(CoRow);
                 Cg.push_back(CgRow);
@@ -68,6 +70,8 @@ namespace YCoCgConversion {
         int CoVal = CgRow[0];
 
         for(int row = 0; row < height; row++) {
+
+            // Get the closest Co / Cg rows for calculations
             if(row % DOWNSAMPLE_VERT == 0){
                 CoRow = Co[row / DOWNSAMPLE_VERT];
                 CgRow = Cg[row / DOWNSAMPLE_VERT];
@@ -76,6 +80,7 @@ namespace YCoCgConversion {
 
             for(int col = 0; col < width; col++) {
 
+                // Get the given Co/Cg values for the given  row and column
                 if(col % DOWNSAMPLE_HORZ == 0) {
                     CgVal = CgRow[col / DOWNSAMPLE_HORZ];
                     CoVal = CoRow[col / DOWNSAMPLE_HORZ];
@@ -87,6 +92,8 @@ namespace YCoCgConversion {
                 int green = CgVal + YVal;
                 int blue = -CgVal + YVal - CoVal;
 
+
+                // Checks if the values are within range
                 red = boundValue(red, 255, 0);
                 green = boundValue(green, 255, 0);
                 blue = boundValue(blue, 255, 0);
@@ -102,6 +109,8 @@ namespace YCoCgConversion {
 
     }
 
+
+    // Bounds a value between a given max and min
     int boundValue(int value, int max, int min) {
         if(value > max) {
             return max;

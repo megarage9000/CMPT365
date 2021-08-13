@@ -9,6 +9,7 @@
 const int DIMENSION = 8;
 const double EMPTY_VALUE = 0;
 
+// DCT class also applies quantization
 class dctTransform
 {
 public:

@@ -1,7 +1,7 @@
 #include "imagefilehelpers.h"
 
 namespace ImageHelpers {
-    void saveImage(QString path, std::vector<std::vector<QRgb>> rgbs)
+    QImage saveImage(QString path, std::vector<std::vector<QRgb>> rgbs)
     {
         int width = rgbs[0].size();
         int height = rgbs.size();
@@ -18,6 +18,7 @@ namespace ImageHelpers {
         if(fileToSave.open(QIODevice::WriteOnly | QIODevice::Truncate)){
             image.save(&fileToSave, "bmp");
         }
+        return getImage(path);
     }
 
     QImage getImage(QString path)

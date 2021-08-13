@@ -2,6 +2,12 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "bmpfile.h"
+#include "ycocgconversion.h"
+#include "dcttransform.h"
+#include "imagefilehelpers.h"
+#include <QFileDialog>
+#include <QPixmap>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -14,6 +20,9 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+
+private slots:
+    void on_imageSelect_clicked();
 
 private:
     Ui::MainWindow *ui;

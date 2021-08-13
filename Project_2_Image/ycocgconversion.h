@@ -5,7 +5,6 @@
 #include <QImage>
 #include <iostream>
 
-// -- Using vectors for flexibility
 // use 4:2:0 downsampling
 // use YCoCg converter
 namespace YCoCgConversion {

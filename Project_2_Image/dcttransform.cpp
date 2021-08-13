@@ -25,6 +25,8 @@ dctTransform::dctTransform(std::vector<std::vector<int>> values, bool inverse)
     // Get Transform transpose
     transformTranspose = getTranspose(transform);
 
+
+    // Determining A and B matrices for multiplication
     std::vector<std::vector<double>> matrixA;
     std::vector<std::vector<double>> matrixB;
     if(inverse){
@@ -59,6 +61,7 @@ dctTransform::dctTransform(std::vector<std::vector<int>> values, bool inverse)
                 }
             }
 
+            // A x values x B
             std::vector<std::vector<double>> subMatrixValues = createSubMatrix(values, row, col, rowEnd, colEnd);
             std::vector<std::vector<double>> resultA = matrixMultiplication(matrixA, subMatrixValues);
             std::vector<std::vector<double>> resultB = matrixMultiplication(resultA, matrixB);
@@ -78,6 +81,7 @@ dctTransform::dctTransform(std::vector<std::vector<int>> values, bool inverse)
     }
 }
 
+// Returns transpose matrix
 std::vector<std::vector<double>> dctTransform::getTranspose(std::vector<std::vector<double>> inputMatrix) {
     std::vector<std::vector<double>> transpose;
 
@@ -94,6 +98,7 @@ std::vector<std::vector<double>> dctTransform::getTranspose(std::vector<std::vec
     return transpose;
 }
 
+// Gets the DCT value for a given row and column and dimension
 double dctTransform::getDctTransform(int i, int j, int n) {
     double a = (i == 0) ? (sqrt(1.0 / n)) : (sqrt(2.0 / n));
     double numerator = ((2 * j  + 1) * i * M_PI);
@@ -122,6 +127,8 @@ std::vector<std::vector<double>> matrixMultiplication(std::vector<std::vector<do
     return resultMatrix;
 }
 
+// Creates a smaller matrix from a larger matrix
+// - Requires a rowStart and rowEnd, colStart and colEnd
 std::vector<std::vector<double>> createSubMatrix(std::vector<std::vector<int>> values, int rowStart, int colStart, int rowEnd, int colEnd){
     std::vector<std::vector<double>> vectorToReturn = std::vector<std::vector<double>>();
 
@@ -147,6 +154,7 @@ std::vector<std::vector<double>> createSubMatrix(std::vector<std::vector<int>> v
     return vectorToReturn;
 }
 
+// Maps matrix values from one matrix to another
 void mapMatrixValues(std::vector<std::vector<int>> * dest, std::vector<std::vector<double>> source, int rowStart, int colStart, int rowEnd, int colEnd){
 
     int sourceMaxWidth = source[0].size();

@@ -9,7 +9,7 @@
 
 namespace ImageHelpers {
 
-    void saveImage(QString path, std::vector<std::vector<QRgb>> rgbs);
+    QImage saveImage(QString path, std::vector<std::vector<QRgb>> rgbs);
     QImage getImage(QString path);
 }
 

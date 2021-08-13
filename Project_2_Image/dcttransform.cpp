@@ -49,13 +49,32 @@ dctTransform::dctTransform(std::vector<std::vector<int>> values, bool inverse)
             if(colEnd >= width){
                 colEnd = width - 1;
             }
+
+            // apply dequantization if inverese
+            if(inverse){
+                for(int i = row; i < rowEnd; i++) {
+                    for(int j = col; j < colEnd; j++) {
+                        values[i][j] = (int)values[i][j] * quantTable[i % DIMENSION][j % DIMENSION];
+                    }
+                }
+            }
+
             std::vector<std::vector<double>> subMatrixValues = createSubMatrix(values, row, col, rowEnd, colEnd);
             std::vector<std::vector<double>> resultA = matrixMultiplication(matrixA, subMatrixValues);
             std::vector<std::vector<double>> resultB = matrixMultiplication(resultA, matrixB);
             mapMatrixValues(&result, resultB, row, col, rowEnd, colEnd);
+
+            // apply quantization if not inverse
+            if(!inverse){
+                for(int i = row; i < rowEnd; i++) {
+                    for(int j = col; j < colEnd; j++) {
+                        result[i][j] = (int)result[i][j] / quantTable[i % DIMENSION][j % DIMENSION];
+                    }
+                }
+            }
+
         }
         col = 0;
-        std::cout << "\n";
     }
 }
 

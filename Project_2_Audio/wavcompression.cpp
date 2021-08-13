@@ -22,53 +22,31 @@ wavCompression::wavCompression(QString fileName)
 void wavCompression::compress() {
     getMidSideChannels();
     linearPredict(10);
-//    midXCode = LZWMap(midXPredict);
-//    midXCode.writeToFile("midXCode.txt");
-    evx::entropy_coder coder;
-    evx::bitstream midXStream(midXPredict.data(), midXPredict.size());
-    evx::bitstream midXStreamCode(midXPredict.size());
-    coder.encode(&midXStream, &midXStreamCode);
-
-    QFile midXFile("midXCode.txt");
-
-    if(midXFile.open(QIODevice::WriteOnly | QIODevice::Text)){
-        QTextStream out(&midXFile);
-
-        out << midXStreamCode.query_data();
-    }
-
-    writeSamplesToFile("samples.txt");
-    QFile samplesFile("samples.txt");
-
+    QVector<int> midSide;
     if(isStereo){
-//        sideYCode = LZWMap(sideYPredict);
-//        sideYCode.writeToFile("sideYCode.txt");
-
-        QFile sideYFile("sideYCode.txt");
-
-        int sizeOfCode = sideYFile.size() + midXFile.size();
-        int sizeOfSamples = samplesFile.size();
-
-        std::cout << "Samples size in bytes = " << sizeOfSamples
-                  << ", size of coded sequence = " << sizeOfCode
-                  << ", Compression Ratio = " << (float)sizeOfSamples / sizeOfCode
-                  << "\n";
-
+       int size = fileToRead.getDataSizeInSamples() * 2;
+       midSide = QVector<int>();
+       for(int i = 0; i < size; i++) {
+           if(i % 2 == 0) {
+               midSide.push_back(sideYPredict[i / 2]);
+           }
+           else{
+               midSide.push_back(midXPredict[i / 2]);
+           }
+       }
     }
-    else {
-        int sizeOfCode = midXFile.size();
-        int sizeOfSamples = samplesFile.size();
-
-        std::cout << "Samples size in bytes = " << sizeOfSamples
-                  << ", size of coded sequence = " << sizeOfCode
-                  << ", Compression Ratio = " << (float)sizeOfSamples / sizeOfCode
-                  << "\n";
-
+    else{
+        midSide = midXPredict;
     }
 
-    midXFile.close();
-    samplesFile.close();
+    LZWMap lzwMap = LZWMap(midSide);
+    lzwMap.writeToFile("/home/megarage9000/repos/CMPT365/Project_2_test_files/Project2/samplesCompressed.txt");
+    writeSamplesToFile("/home/megarage9000/repos/CMPT365/Project_2_test_files/Project2/samples.txt");
 
+    int sizeCompressed = QFile("/home/megarage9000/repos/CMPT365/Project_2_test_files/Project2/samplesCompressed.txt").size();
+    int sizeNormal = QFile("/home/megarage9000/repos/CMPT365/Project_2_test_files/Project2/samples.txt").size();
+
+    std::cout << "Compressed = " << sizeCompressed << ", Uncompressed = " << sizeNormal << ", ratio = " << (float)sizeNormal/sizeCompressed << "\n";
 }
 
 void wavCompression::getMidSideChannels(){
@@ -81,7 +59,6 @@ void wavCompression::getMidSideChannels(){
         for(int i = 0; i < numSamples; i++) {
             midX[i] = (samplesLeft[i] + samplesRight[i]) / 2.0f;
             sideY[i] = (samplesLeft[i] - samplesRight[i]) / 2.0f;
-            //std::cout << "mid, side at " << i << ": " << midX[i] << ", " << sideY[i] << "\n";
         }
    }
     else {
@@ -107,20 +84,14 @@ int wavCompression::predictor(QVector<float> values, int maxOrder, int index){
     return numerator / divisor;
 }
 
-
-
-// NEEED TO REVISIT: LOOK AT CHAPTER 13 / 6 OF YOUR TEXTBOOK
 void wavCompression::linearPredict(int order){
 
     int numSamples = fileToRead.getDataSizeInSamples();
-    int range = fileToRead.getHighestAmplitude() - fileToRead.getLowestAmplitude();
     if(isStereo) {
         midXPredict = QVector<int>(numSamples);
         sideYPredict = QVector<int>(numSamples);
 
        for(int i = 0; i < numSamples; i++) {
-//            midXPredict[i] = quantizer(midX[i] - predictor(midX, order, i), range);
-//            sideYPredict[i] = quantizer(sideY[i] - predictor(sideY, order, i), range);
            midXPredict[i] = midX[i] - predictor(midX, order, i);
            sideYPredict[i] = sideY[i] - predictor(sideY, order, i);
        }
@@ -128,7 +99,6 @@ void wavCompression::linearPredict(int order){
     else{
         midXPredict = QVector<int>(numSamples);
         for(int i = 0; i < numSamples; i++) {
-//            midXPredict[i] = quantizer(midX[i] - predictor(midX, order, i), range);
             midXPredict[i] = midX[i] - predictor(midX, order, i);
         }
     }

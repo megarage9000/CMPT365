@@ -3,7 +3,7 @@
 
 // Returns a code given a vector, else it updates the map with a new value
 // - if it doesn't find a value, returns -1
-int LZWMap::getCodeFromMap(std::vector<int> key, int * code) {
+int LZWMap::getCodeFromMap(std::string key, int * code) {
     auto element = dictionary.find(key);
     if(element != dictionary.end()) {
         return element->second;
@@ -15,8 +15,8 @@ int LZWMap::getCodeFromMap(std::vector<int> key, int * code) {
     }
 }
 
-void LZWMap::addToMap(std::vector<int> key, int value){
-    dictionary.insert(std::pair<std::vector<int>, int> (key, value) );
+void LZWMap::addToMap(std::string key, int value){
+    dictionary.insert(std::pair<std::string, char> (key, value) );
 }
 
 LZWMap::LZWMap() {
@@ -25,32 +25,50 @@ LZWMap::LZWMap() {
 
 LZWMap::LZWMap(QVector<int> sequence)
 {
-    int numElements = sequence.size();
-    newCode = std::vector<int>();
 
-    // initialize dictionary with 3 values of sequences
-    addToMap(std::vector<int>{sequence[0]}, 0);
-    addToMap(std::vector<int>{sequence[1]}, 1);
-    addToMap(std::vector<int>{sequence[2]}, 2);
-    int code = 3;
+    newCode = "";
 
-    std::vector<int> sequenceToBeRead = std::vector<int>{sequence[0]};
-    for(int i = 1; i < numElements; i++) {
-        std::vector<int> prevSequenceRead = std::vector<int>(sequenceToBeRead);
-        sequenceToBeRead.push_back(sequence[i]);
-        if(getCodeFromMap(sequenceToBeRead, &code) == -1) {
-            while(getCodeFromMap(prevSequenceRead, &code) == -1);
-            int codeToAdd = dictionary.at(prevSequenceRead);
-            newCode.push_back(codeToAdd);
-            sequenceToBeRead.clear();
-            sequenceToBeRead.push_back(sequence[i]);
+    // Convert sequence to string
+    std::ostringstream oss;
+    std::copy(sequence.begin(), sequence.end() - 1,
+              std::ostream_iterator<int>(oss, SEPARATOR.c_str()));
+    oss << sequence.back();
+    std::string sequenceString = oss.str();
+
+    getCodeFromMap(SEPARATOR, &code);
+    getCodeFromMap("0", &code);
+    getCodeFromMap("1", &code);
+    getCodeFromMap("2", &code);
+    getCodeFromMap("3", &code);
+    getCodeFromMap("4", &code);
+    getCodeFromMap("5", &code);
+    getCodeFromMap("6", &code);
+    getCodeFromMap("7", &code);
+    getCodeFromMap("8", &code);
+    getCodeFromMap("9", &code);
+    getCodeFromMap("-", &code);
+
+
+    int sequenceLength = sequenceString.length();
+
+    std::string sequenceToRead = std::string(1, sequenceString[0]);
+    std::string newSequence = "";
+    for(int i = 1 ; i < sequenceLength; i++){
+        char nextInputChar = sequenceString[i];
+
+        newSequence = sequenceToRead + nextInputChar;
+        int retrievedCode = getCodeFromMap(newSequence, &code);
+        // If not exist
+        if(retrievedCode == -1){
+            newCode += std::to_string(getCodeFromMap(sequenceToRead, &code));
+            newSequence = "";
+            sequenceToRead = std::string(1, nextInputChar);
+        }
+        // If exist
+        else{
+            sequenceToRead = newSequence;
         }
     }
-    newCode.push_back(
-           getCodeFromMap(sequenceToBeRead, &code)
-    );
-
-    newCode.shrink_to_fit();
 }
 
 void LZWMap::writeToFile(QString filename) {
@@ -59,19 +77,8 @@ void LZWMap::writeToFile(QString filename) {
     if(file.open(QIODevice::WriteOnly | QIODevice::Text)) {
         QTextStream out(&file);
 
-//        // Write dictionary pairs
-//        for (auto const &entry: dictionary) {
-//            std::vector<int> sequence = entry.first;
-//            int code = entry.second;
-
-//            for(int num: sequence) {
-//                out << num;
-//            }
-//            out << code;
-//        }
-
         // Write code
-        int newCodeSize = newCode.size();
+        int newCodeSize = newCode.length();
         for(int i = 0; i < newCodeSize; i++) {
             out << newCode[i];
         }

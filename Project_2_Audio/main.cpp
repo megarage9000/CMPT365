@@ -2,6 +2,7 @@
 
 #include <QApplication>
 #include "wavcompression.h"
+#include "lzwmap.h"
 
 int main(int argc, char *argv[])
 {
@@ -9,6 +10,8 @@ int main(int argc, char *argv[])
     MainWindow w;
     wavCompression compression = wavCompression("/home/megarage9000/repos/CMPT365/Project_2_Audio/wavTestFiles/Cowbell-Mono.wav");
     //wavCompression compression = wavCompression("/home/megarage9000/repos/CMPT365/Project_2_Audio/wavTestFiles/M1F1-int16-AFsp.wav");
+
+
     w.show();
     return a.exec();
 }

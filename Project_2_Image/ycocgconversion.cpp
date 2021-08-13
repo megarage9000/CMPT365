@@ -30,8 +30,7 @@ namespace YCoCgConversion {
                 int green = qGreen(value);
                 int blue = qBlue(value);
 
-
-                int CoVal = red / 2.0f - green / 2.0f; // Co
+                int CoVal = red / 2.0f - blue / 2.0f; // Co
                 int CgVal = green / 2.0f - blue / 4.0f - red / 4.0f; // Cg
                 int YVal =  green / 2.0f + blue / 4.0f + red / 4.0f; // Y
 

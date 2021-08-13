@@ -10,8 +10,7 @@ CONFIG += c++11
 
 SOURCES += \
     bmpfile.cpp \
-    imagecompressor.cpp \
-    imagedecompressor.cpp \
+    dcttransform.cpp \
     imagefilehelpers.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -19,8 +18,7 @@ SOURCES += \
 
 HEADERS += \
     bmpfile.h \
-    imagecompressor.h \
-    imagedecompressor.h \
+    dcttransform.h \
     imagefilehelpers.h \
     mainwindow.h \
     ycocgconversion.h

@@ -22,7 +22,10 @@ private:
     std::vector<std::vector<double>> transformTranspose;
 };
 
+
 std::vector<std::vector<double>> createSubMatrix(std::vector<std::vector<int>> values, int rowStart, int colStart, int rowEnd, int colEnd);
+void mapMatrixValues(std::vector<std::vector<int>>* dest, std::vector<std::vector<double>> * source, int rowStart, int colStart, int rowEnd, int colEnd);
+
 
 
 #endif // DCTTRANSFORM_H

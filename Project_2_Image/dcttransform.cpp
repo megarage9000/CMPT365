@@ -57,3 +57,54 @@ std::vector<std::vector<double>> createSubMatrix(std::vector<std::vector<int>> v
     }
     return vectorToReturn;
 }
+
+void mapMatrixValues(std::vector<std::vector<int>> * dest, std::vector<std::vector<double>> * source, int rowStart, int colStart, int rowEnd, int colEnd){
+
+    int sourceMaxWidth = source->at(0).size();
+    int sourceMaxHeight = source->size();
+
+    int sourceRow = 0;
+    int sourceCol = 0;
+
+    for(int row = rowStart; row <= rowEnd; row++){
+
+        for(int col = colStart; col <= colEnd; col++){
+            dest->at(row)[col] = source->at(sourceRow)[sourceCol];
+            sourceCol++;
+            if(sourceCol >= sourceMaxWidth){
+                break;
+            }
+        }
+
+        sourceCol = 0;
+        sourceRow++;
+        if(sourceRow >= sourceMaxHeight){
+            break;
+        }
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

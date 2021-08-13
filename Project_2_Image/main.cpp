@@ -30,13 +30,26 @@ int main(int argc, char *argv[])
         {11, 11, 11, 11, 11, 11, 11, 11, 13},
         {12, 12, 12, 12, 12, 12, 12, 12, 13},
         {10, 10, 10, 10, 10, 10, 10, 10, 13},
-        {11, 11, 11, 11, 11, 11, 11, 11, 13},
+        {11, 11, 11, 11, 11, 11, 11, 11, 14},
         {11, 11, 11, 11, 11, 11, 11, 11, 13},
         {11, 11, 11, 11, 11, 11, 11, 11, 13},
     };
 
+    std::vector<std::vector<int>> values2 = {
+        {12, 10, 11, 20, 23, 25, 12, 12, 42},
+        {12, 10, 11, 20, 23, 25, 12, 12, 42},
+        {12, 10, 11, 20, 23, 25, 12, 12, 42},
+        {12, 10, 11, 20, 23, 25, 12, 12, 42},
+        {12, 10, 11, 20, 23, 25, 12, 12, 42},
+        {12, 10, 11, 20, 23, 25, 12, 12, 42},
+        {12, 10, 11, 20, 23, 25, 12, 12, 42},
+        {12, 10, 11, 20, 23, 25, 12, 12, 42},
+    };
+
     std::vector<std::vector<double>> subMatrix =
-            createSubMatrix(values, 0, 0, 7, 7);
+            createSubMatrix(values, 2, 2, 6, 6);
+
+    mapMatrixValues(&values2, &subMatrix, 1, 1, 5, 5);
 
     int width = subMatrix[0].size();
     int height = subMatrix.size();
@@ -47,6 +60,17 @@ int main(int argc, char *argv[])
         }
         std::cout << "\n";
     }
+    std::cout << "-------------------------------------\n";
+    int width2 = values2[0].size();
+    int height2 = values2.size();
+
+    for(int i = 0; i < height2; i++){
+        for(int j = 0; j < width2; j++){
+            std::cout << values2[i][j] << "|";
+        }
+        std::cout << "\n";
+    }
+    std::cout << "-------------------------------------\n";
 
     w.show();
     return a.exec();

@@ -12,6 +12,7 @@ SOURCES += \
     bmpfile.cpp \
     imagecompressor.cpp \
     imagedecompressor.cpp \
+    imagefilehelpers.cpp \
     main.cpp \
     mainwindow.cpp \
     ycocgconversion.cpp
@@ -20,6 +21,7 @@ HEADERS += \
     bmpfile.h \
     imagecompressor.h \
     imagedecompressor.h \
+    imagefilehelpers.h \
     mainwindow.h \
     ycocgconversion.h
 

@@ -12,7 +12,8 @@ const double EMPTY_VALUE = 0;
 class dctTransform
 {
 public:
-    dctTransform(std::vector<std::vector<int>> values);
+    dctTransform(std::vector<std::vector<int>> values, bool inverse);
+    std::vector<std::vector<int>> result;
 
 private:
     double getDctTransform(int i, int j, int n);
@@ -20,11 +21,13 @@ private:
 
     std::vector<std::vector<double>> transform;
     std::vector<std::vector<double>> transformTranspose;
+
 };
 
 
+std::vector<std::vector<double>> matrixMultiplication(std::vector<std::vector<double>> A, std::vector<std::vector<double>> B);
 std::vector<std::vector<double>> createSubMatrix(std::vector<std::vector<int>> values, int rowStart, int colStart, int rowEnd, int colEnd);
-void mapMatrixValues(std::vector<std::vector<int>>* dest, std::vector<std::vector<double>> * source, int rowStart, int colStart, int rowEnd, int colEnd);
+void mapMatrixValues(std::vector<std::vector<int>>* dest, std::vector<std::vector<double>> source, int rowStart, int colStart, int rowEnd, int colEnd);
 
 
 

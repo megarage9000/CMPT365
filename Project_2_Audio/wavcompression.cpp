@@ -3,6 +3,14 @@
 
 wavCompression::wavCompression(QString fileName)
 {
+    this->fileName = fileName;
+
+    this->fileName.chop(this->fileName.length() - this->fileName.lastIndexOf("/"));
+    compressedLocation = this->fileName + "/compressed.txt";
+    uncompressedLocation = this->fileName + "/uncompressed.txt";
+
+    std::cout << "Compressed location = " << compressedLocation.toStdString() << "\nUncompressed location = " << uncompressedLocation.toStdString() << "\n";
+
     fileToRead = wavfile<int>();
     fileToRead.readWavFile(fileName);
 
@@ -18,7 +26,11 @@ wavCompression::wavCompression(QString fileName)
 
     compress();
 }
-
+float wavCompression::getFileRatio(){
+    int sizeCompressed = QFile(compressedLocation).size();
+    int sizeNormal = QFile(uncompressedLocation).size();
+    return (float)sizeNormal / sizeCompressed;
+}
 void wavCompression::compress() {
     getMidSideChannels();
     linearPredict(10);
@@ -40,13 +52,10 @@ void wavCompression::compress() {
     }
 
     LZWMap lzwMap = LZWMap(midSide);
-    lzwMap.writeToFile("/home/megarage9000/repos/CMPT365/Project_2_test_files/Project2/samplesCompressed.txt");
-    writeSamplesToFile("/home/megarage9000/repos/CMPT365/Project_2_test_files/Project2/samples.txt");
+    lzwMap.writeToFile(compressedLocation);
+    writeSamplesToFile(uncompressedLocation);
 
-    int sizeCompressed = QFile("/home/megarage9000/repos/CMPT365/Project_2_test_files/Project2/samplesCompressed.txt").size();
-    int sizeNormal = QFile("/home/megarage9000/repos/CMPT365/Project_2_test_files/Project2/samples.txt").size();
-
-    std::cout << "Compressed = " << sizeCompressed << ", Uncompressed = " << sizeNormal << ", ratio = " << (float)sizeNormal/sizeCompressed << "\n";
+    std::cout << "ratio = " << getFileRatio() << "\n";
 }
 
 void wavCompression::getMidSideChannels(){
@@ -61,9 +70,6 @@ void wavCompression::getMidSideChannels(){
             sideY[i] = (samplesLeft[i] - samplesRight[i]) / 2.0f;
         }
    }
-    else {
-        std::cout << "Not Stereo\n";
-    }
 }
 
 int wavCompression::predictor(QVector<float> values, int maxOrder, int index){

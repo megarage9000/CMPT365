@@ -17,12 +17,16 @@ public:
     LZWMap midXCode;
     LZWMap sideYCode;
 
+    float getFileRatio();
+
 private:
     void compress();
     void getMidSideChannels();
     void linearPredict(int order);
     int predictor(QVector<float> values, int maxOrder, int index);
-
+    QString fileName;
+    QString compressedLocation;
+    QString uncompressedLocation;
     wavfile<int> fileToRead;
     bool isStereo;
     QVector<float> midX;

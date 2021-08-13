@@ -35,6 +35,8 @@ LZWMap::LZWMap(QVector<int> sequence)
     oss << sequence.back();
     std::string sequenceString = oss.str();
 
+
+    // Initialize dictionary
     getCodeFromMap(SEPARATOR, &code);
     getCodeFromMap("0", &code);
     getCodeFromMap("1", &code);
@@ -54,23 +56,29 @@ LZWMap::LZWMap(QVector<int> sequence)
     std::string sequenceToRead = std::string(1, sequenceString[0]);
     std::string newSequence = "";
     for(int i = 1 ; i < sequenceLength; i++){
+        // c
         char nextInputChar = sequenceString[i];
 
+        // s + c
         newSequence = sequenceToRead + nextInputChar;
         int retrievedCode = getCodeFromMap(newSequence, &code);
-        // If not exist
+        //If s + c does not exist
         if(retrievedCode == -1){
+            // Add s to newCode
             newCode += std::to_string(getCodeFromMap(sequenceToRead, &code));
             newSequence = "";
+            // s = c
             sequenceToRead = std::string(1, nextInputChar);
         }
-        // If exist
+        // If s + c does exist
         else{
+            // s += c
             sequenceToRead = newSequence;
         }
     }
 }
 
+// Writes result to file
 void LZWMap::writeToFile(QString filename) {
     QFile file(filename);
 

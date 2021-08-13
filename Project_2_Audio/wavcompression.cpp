@@ -3,18 +3,20 @@
 
 wavCompression::wavCompression(QString fileName)
 {
+    // Creating the locations of our files that we will use for comparison
     this->fileName = fileName;
-
     this->fileName.chop(this->fileName.length() - this->fileName.lastIndexOf("/"));
     compressedLocation = this->fileName + "/compressed.txt";
     uncompressedLocation = this->fileName + "/uncompressed.txt";
 
-    std::cout << "Compressed location = " << compressedLocation.toStdString() << "\nUncompressed location = " << uncompressedLocation.toStdString() << "\n";
-
+    // Read wav file samples as integer
     fileToRead = wavfile<int>();
     fileToRead.readWavFile(fileName);
 
+
     isStereo = fileToRead.isStereo();
+
+    // If not stereo, store all samples into the midX QVector
     if(!isStereo){
         int numSamples = fileToRead.getDataSizeInSamples();
         midX = QVector<float>(numSamples);
@@ -34,6 +36,9 @@ float wavCompression::getFileRatio(){
 void wavCompression::compress() {
     getMidSideChannels();
     linearPredict(10);
+
+    // Combines the side and mid channels into one vector
+    // for compression if it is stereo
     QVector<int> midSide;
     if(isStereo){
        int size = fileToRead.getDataSizeInSamples() * 2;
@@ -51,16 +56,21 @@ void wavCompression::compress() {
         midSide = midXPredict;
     }
 
+    // Compress using LZW compression technique
     LZWMap lzwMap = LZWMap(midSide);
-    lzwMap.writeToFile(compressedLocation);
-    writeSamplesToFile(uncompressedLocation);
 
-    std::cout << "ratio = " << getFileRatio() << "\n";
+    // Write the results to a file
+    lzwMap.writeToFile(compressedLocation);
+    // Write the original file (samples only) to file
+    writeSamplesToFile(uncompressedLocation);
 }
 
+// Only applies stereo wav files
 void wavCompression::getMidSideChannels(){
     if(isStereo) {
         int numSamples = fileToRead.getDataSizeInSamples();
+
+        // Store the midX and SideY as float samples for linear predictions
         midX = QVector<float>(numSamples);
         sideY = QVector<float>(numSamples);
         QVector<int> samplesLeft = fileToRead.getAmplitudes();
@@ -72,6 +82,10 @@ void wavCompression::getMidSideChannels(){
    }
 }
 
+// Predictor goes as follows
+// - result = 1/n (value 1 + value 2 + value 3 + ... value N - 1)
+// - If the values are less than do the given order, than n would
+// equal the number of values present
 int wavCompression::predictor(QVector<float> values, int maxOrder, int index){
     if(index == 0) {
         return values[0];
@@ -93,6 +107,8 @@ int wavCompression::predictor(QVector<float> values, int maxOrder, int index){
 void wavCompression::linearPredict(int order){
 
     int numSamples = fileToRead.getDataSizeInSamples();
+
+    // If Stereo, linearly predict for mid and side channels
     if(isStereo) {
         midXPredict = QVector<int>(numSamples);
         sideYPredict = QVector<int>(numSamples);
@@ -102,6 +118,7 @@ void wavCompression::linearPredict(int order){
            sideYPredict[i] = sideY[i] - predictor(sideY, order, i);
        }
     }
+    // For single channel, use the unchanged samples store in midX
     else{
         midXPredict = QVector<int>(numSamples);
         for(int i = 0; i < numSamples; i++) {
@@ -110,6 +127,7 @@ void wavCompression::linearPredict(int order){
     }
 }
 
+// Simply writes samples to file
 void wavCompression::writeSamplesToFile(QString fileName) {
     QFile file(fileName);
 

@@ -4,10 +4,7 @@
 #include "wavfile.h"
 #include "wavfile.cpp"
 #include "lzwmap.h"
-#include "abac-master/cabac.h"
-#include "abac-master/math.h"
 
-// Look at https://monkeysaudio.com/theory.html for more information
 class wavCompression
 {
 public:

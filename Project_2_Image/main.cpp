@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     MainWindow w;
 
-    BMPFile file = BMPFile("/home/megarage9000/repos/CMPT365/Project_2_test_files/Project2/bmp-sample-3.bmp");
+    BMPFile file = BMPFile("/home/megarage9000/repos/CMPT365/Project_2_test_files/Project2/bmp-sample-1.bmp");
 
     YCoCgConversion::RGBToYCoCg conversionA = YCoCgConversion::RGBToYCoCg(file.getRgbs());
     dctTransform transformY = dctTransform(conversionA.Y, false);
@@ -24,15 +24,7 @@ int main(int argc, char *argv[])
                     dctTransform(transformCg.result, true).result
                 );
 
-    YCoCgConversion::YCoCgToRGB conversionBB = YCoCgConversion::YCoCgToRGB(
-                    conversionA.Y,
-                    conversionA.Co,
-                    conversionA.Cg
-                );
-
-
     ImageHelpers::saveImage("/home/megarage9000/repos/CMPT365/Project_2_test_files/Project2/bmp-sample-converteddct.bmp", conversionBA.rgbs);
-    ImageHelpers::saveImage("/home/megarage9000/repos/CMPT365/Project_2_test_files/Project2/bmp-sample-converted.bmp", conversionBB.rgbs);
     w.show();
     return a.exec();
 }

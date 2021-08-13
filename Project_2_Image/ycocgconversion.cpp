@@ -68,25 +68,29 @@ namespace YCoCgConversion {
         int CoVal = CgRow[0];
 
         for(int row = 0; row < height; row++) {
-
-            if(row % DOWNSAMPLE_VERT == 0) {
+            if(row % DOWNSAMPLE_VERT == 0){
                 CoRow = Co[row / DOWNSAMPLE_VERT];
                 CgRow = Cg[row / DOWNSAMPLE_VERT];
             }
-
             std::vector<QRgb> rgbRow = std::vector<QRgb>();
 
             for(int col = 0; col < width; col++) {
 
-                if(row % DOWNSAMPLE_VERT == 0 && col % DOWNSAMPLE_HORZ == 0) {
+                if(col % DOWNSAMPLE_HORZ == 0) {
                     CgVal = CgRow[col / DOWNSAMPLE_HORZ];
                     CoVal = CoRow[col / DOWNSAMPLE_HORZ];
                 }
+
                 int YVal = Y[row][col];
 
                 int red = -CgVal + YVal + CoVal;
                 int green = CgVal + YVal;
                 int blue = -CgVal + YVal - CoVal;
+
+                red = boundValue(red, 255, 0);
+                green = boundValue(green, 255, 0);
+                blue = boundValue(blue, 255, 0);
+
 
                 QRgb rgbVal = qRgb(red, green, blue);
                 rgbRow.push_back(rgbVal);
@@ -96,6 +100,16 @@ namespace YCoCgConversion {
 
         }
 
+    }
+
+    int boundValue(int value, int max, int min) {
+        if(value > max) {
+            return max;
+        }
+        if(value < min){
+            return min;
+        }
+        return value;
     }
 }
 

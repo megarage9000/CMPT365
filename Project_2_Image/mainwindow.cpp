@@ -18,6 +18,12 @@ void MainWindow::on_imageSelect_clicked()
 {
     QString fileLocation = QFileDialog::getOpenFileName(this, tr("Choose image"),
                                                         "", tr("Images (*.bmp)"));
+    QString modifiedImageLocation = fileLocation;
+
+    modifiedImageLocation.chop(modifiedImageLocation.length() - modifiedImageLocation.lastIndexOf("/"));
+    QString dctResultsLocation = modifiedImageLocation;
+    modifiedImageLocation += "/modifiedImage.bmp";
+
 
     BMPFile file = BMPFile(fileLocation);
 
@@ -26,15 +32,79 @@ void MainWindow::on_imageSelect_clicked()
     dctTransform transformCo = dctTransform(conversionA.Co, false);
     dctTransform transformCg = dctTransform(conversionA.Cg, false);
 
+    // Write results to file
+    QFile YData = QFile(dctResultsLocation + "/YDctResults.txtt");
+    QFile CoData = QFile(dctResultsLocation + "/CoDctResults.txt");
+    QFile CgData = QFile(dctResultsLocation + "/CgDctResults.txt");
+
+
+
+    // Y File
+    if(YData.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text)) {
+        QTextStream stream(&YData);
+        stream << "Y DCT DATA \n";
+        std::vector<std::vector<int>> results = transformY.result;
+        int width = results[0].size();
+        int height = results.size();
+
+        for(int row = 0; row < height; row++) {
+            std::vector<int> rowToRead = results[row];
+            for(int col = 0; col < width; col++) {
+                stream << rowToRead[col];
+                stream << " ";
+
+            }
+            stream << "\n";
+        }
+        YData.close();
+    }
+
+    // Co File
+    if(CoData.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text)) {
+        QTextStream stream(&CoData);
+        stream << "Co DCT DATA \n";
+        std::vector<std::vector<int>> results = transformCo.result;
+        int width = results[0].size();
+        int height = results.size();
+
+        for(int row = 0; row < height; row++) {
+            std::vector<int> rowToRead = results[row];
+            for(int col = 0; col < width; col++) {
+                stream << rowToRead[col];
+                stream << " ";
+
+            }
+            stream << "\n";
+        }
+        CoData.close();
+    }
+
+    // Cg File
+    if(CgData.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text)) {
+        QTextStream stream(&CgData);
+        stream << "Cg DCT DATA \n";
+        std::vector<std::vector<int>> results = transformCg.result;
+        int width = results[0].size();
+        int height = results.size();
+
+        for(int row = 0; row < height; row++) {
+            std::vector<int> rowToRead = results[row];
+            for(int col = 0; col < width; col++) {
+                stream << rowToRead[col];
+                stream << " ";
+
+            }
+            stream << "\n";
+        }
+        CgData.close();
+    }
+
     YCoCgConversion::YCoCgToRGB conversionBA = YCoCgConversion::YCoCgToRGB(
                     dctTransform(transformY.result, true).result,
                     dctTransform(transformCo.result, true).result,
                     dctTransform(transformCg.result, true).result
                 );
 
-    QString modifiedImageLocation = fileLocation;
-    modifiedImageLocation.chop(modifiedImageLocation.length() - modifiedImageLocation.lastIndexOf("/"));
-    modifiedImageLocation += "/modifiedImage.bmp";
 
     ImageHelpers::saveImage(modifiedImageLocation, conversionBA.rgbs);
 

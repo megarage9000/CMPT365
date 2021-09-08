@@ -33,6 +33,13 @@ float wavCompression::getFileRatio(){
     int sizeNormal = QFile(uncompressedLocation).size();
     return (float)sizeNormal / sizeCompressed;
 }
+
+int wavCompression::getOriginalFileSize(){
+    return QFile(uncompressedLocation).size();
+}
+int wavCompression::getCompressedFileSize(){
+    return QFile(compressedLocation).size();
+}
 void wavCompression::compress() {
     getMidSideChannels();
     linearPredict(10);

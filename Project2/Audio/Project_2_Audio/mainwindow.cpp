@@ -20,6 +20,11 @@ void MainWindow::on_fileSelect_clicked()
     QString fileName = QFileDialog::getOpenFileName(this,
                     tr("Open Wav file"), "", tr("Wav files(*.wav)"));
     wavCompression compression = wavCompression(fileName);
-    ui->compressionResult->setText(QString::number(compression.getFileRatio()));
+    QString resultString = "Original file size = " +
+                            QString::number(compression.getOriginalFileSize()) +
+                            ", Compressed file size = " +
+                            QString::number(compression.getCompressedFileSize()) +
+                            ", Ratio = " + QString::number(compression.getFileRatio());
+    ui->compressionResult->setText(resultString);
 }
 

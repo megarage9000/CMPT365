@@ -15,6 +15,8 @@ public:
     LZWMap sideYCode;
 
     float getFileRatio();
+    int getOriginalFileSize();
+    int getCompressedFileSize();
 
 private:
     void compress();

@@ -215,11 +215,11 @@ void dct(std::string fileName) {
 
 
 int main(int argc, char * argv[]) {
-    if(argc != 3) {
-        std::cout << "usage: ./test {Arithmetic Encoding Input Text File} {Discrete Cosine Transformation Input Text File}\n";
-        return 1;
-    }
-    arithmeticCoding(argv[1]);
-    dct(argv[2]);
+    // if(argc != 3) {
+    //     std::cout << "usage: ./test {Arithmetic Encoding Input Text File} {Discrete Cosine Transformation Input Text File}\n";
+    //     return 1;
+    // }
+    // arithmeticCoding(argv[1]);
+    dct(argv[1]);
     return 0;
 }

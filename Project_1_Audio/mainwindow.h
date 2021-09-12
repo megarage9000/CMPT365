@@ -36,7 +36,7 @@ private:
     Ui::MainWindow *ui;
     QCustomPlot * plot;
     QCustomPlot * plot2;
-    wavfile * file;
+    wavfile<double> * file;
     QCPTextElement * sampleRateOriginal, * sampleRateModified;
     bool isStereo;
 };

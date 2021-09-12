@@ -17,6 +17,7 @@ SOURCES += \
     wavfile.cpp
 
 HEADERS += \
+    fromLittleEndian.h \
     mainwindow.h \
     qcustomplot.h \
     wavfile.h

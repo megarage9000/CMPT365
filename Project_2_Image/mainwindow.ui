@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Image Transformer </string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QPushButton" name="imageSelect">
@@ -27,7 +27,7 @@
      <string>Choose image</string>
     </property>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -60,7 +60,7 @@
      <x>0</x>
      <y>0</y>
      <width>1200</width>
-     <height>22</height>
+     <height>20</height>
     </rect>
    </property>
   </widget>

@@ -9,8 +9,8 @@
 // use YCoCg converter
 namespace YCoCgConversion {
 
-    const int DOWNSAMPLE_VERT = 20;
-    const int DOWNSAMPLE_HORZ = 20;
+    const int DOWNSAMPLE_VERT = 10;
+    const int DOWNSAMPLE_HORZ = 10;
 
     class RGBToYCoCg {
     public:

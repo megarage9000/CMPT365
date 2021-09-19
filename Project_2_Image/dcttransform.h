@@ -4,7 +4,8 @@
 
 #include <iostream>
 #include <vector>
-#include <math.h>
+#define _USE_MATH_DEFINES // for C++
+#include <cmath>
 
 const int DIMENSION = 8;
 const double EMPTY_VALUE = 0;
